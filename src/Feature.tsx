@@ -17,9 +17,10 @@ export class Feature<P, State> extends Component<
   }
 
   addFeature(geometry: any, properties: any) {
-    const { layer } = this.props;
+    const { layerContext, mapElementContainer } = this.props;
 
-    if (layer) {
+    console.log(mapElementContainer);
+    if (layerContext) {
       const _id = uuid();
       this.setState(state => ({
         ...state,
@@ -36,15 +37,15 @@ export class Feature<P, State> extends Component<
           ...properties
         }
       };
-      layer.addFeature(feature);
+      layerContext.addFeature(feature);
       this.forceUpdate();
     }
   }
+
   componentWillUnmount(): void {
     const { layer } = this.props;
     if (layer) {
       layer.removeFeature(this.state._id);
-      this.forceUpdate();
     }
   }
 }

@@ -94,15 +94,16 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
               "fill-opacity": 0.8
             }
           });
+          const thisLayer = map.getLayer(thisLayerID);
 
           const source: GeoJSONSource = map.getSource(sourceID);
 
           this.layerDataSource = source;
 
           this.mapContext = {
-            mapElementContainer,
+            mapElementContainer: thisLayer,
             map,
-            layer: {
+            layerContext: {
               addFeature: this.addFeature,
               removeFeature: this.removeFeature,
               layerDataSource: this.layerDataSource

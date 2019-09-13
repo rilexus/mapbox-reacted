@@ -71,7 +71,7 @@ const App: React.FC = () => {
         center={center}
       >
         {visible ? (
-          <Layer layerName={'testlayer'}>
+          <Layer layerName={"testlayer"}>
             <MyPol />
             <Polygon coordinates={coordinates} />
           </Layer>
