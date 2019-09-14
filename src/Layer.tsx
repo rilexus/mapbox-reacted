@@ -2,7 +2,14 @@ import React, { Component } from "react";
 import { MapContextProvider, withMapContext } from "./Context";
 import { MapLayer } from "./MapLayer";
 import uuid from "uuid";
-import { GeoJSONSource } from "mapbox-gl";
+import {
+  CirclePaint,
+  FillLayout,
+  FillPaint,
+  GeoJSONSource,
+  LineLayout,
+  LinePaint
+} from "mapbox-gl";
 
 interface LayerStateI {
   features: any[];
@@ -11,10 +18,18 @@ interface LayerStateI {
 }
 interface LayerProps {
   layerName?: string;
+
+  circlePaint?: CirclePaint;
+
+  fillPaint?: FillPaint;
+  fillLayout?: FillLayout;
+
+  linePaint?: LinePaint;
+  lineLayout?: LineLayout;
 }
 
 class Layer extends MapLayer<LayerProps, LayerStateI> {
-  mapContext: any;
+  contextValue: any;
   layerDataSource: any;
   constructor(props: any) {
     super(props);
@@ -26,7 +41,9 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
     this.addFeature = this.addFeature.bind(this);
   }
   getSource = () => {
-    const { map } = this.props;
+    const {
+      mapbox: { map }
+    } = this.props;
     const { sourceID } = this.state;
     return map.getSource(sourceID);
   };
@@ -59,66 +76,115 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
     this.setFeatures(newFeatures);
   };
 
+  addFillLayer = () => {
+    const {
+      mapbox: { map },
+      fillPaint
+    } = this.props;
+
+    const layerID = uuid();
+    map.addLayer({
+      id: layerID,
+      type: "fill",
+      source: this.getSource().id,
+      layout: {},
+      paint: fillPaint ? { ...fillPaint } : {},
+      filter: ["==", "$type", "Polygon"]
+    });
+  };
+
+  addCircleLayer = () => {
+    const {
+      mapbox: { map },
+      circlePaint
+    } = this.props;
+    const layerID = uuid();
+
+    map.addLayer({
+      id: layerID,
+      type: "circle",
+      source: this.getSource().id,
+      paint: circlePaint ? { ...circlePaint } : {},
+      filter: ["==", "$type", "Point"]
+    });
+  };
+
+  addLineLayer = () => {
+    const {
+      mapbox: { map },
+      linePaint,
+      lineLayout
+    } = this.props;
+    const layerID = uuid();
+    map.addLayer({
+      id: layerID,
+      type: "line",
+      source: this.getSource().id,
+      layout: lineLayout ? { ...lineLayout } : {},
+      paint: linePaint ? { ...linePaint } : {},
+      filter: ["==", "$type", "LineString"]
+    });
+  };
+
+  init = () => {
+    const {
+      mapbox: { map }
+    } = this.props;
+    const sourceID = uuid();
+    this.setState(
+      (state: LayerStateI, props: any) => {
+        return {
+          ...state,
+          sourceID: sourceID
+        };
+      },
+      () => {
+        map.addSource(sourceID, {
+          type: "geojson",
+          data: {
+            type: "FeatureCollection",
+            features: []
+          }
+        });
+        this.addFillLayer();
+        this.addCircleLayer();
+        this.addLineLayer();
+
+        const source: GeoJSONSource = this.getSource();
+
+        this.layerDataSource = source;
+
+        this.contextValue = {
+          container: null,
+          map,
+          layer: {
+            addFeature: this.addFeature,
+            removeFeature: this.removeFeature,
+            source: this.layerDataSource
+          }
+        };
+        this.forceUpdate();
+      }
+    );
+  };
   componentDidMount(): void {
     super.componentDidMount();
-
-    const { map, mapElementContainer, layerName } = this.props;
-
-    const thisLayerID = layerName || uuid();
-    const sourceID = uuid();
-
+    const {
+      mapbox: { map }
+    } = this.props;
     map.on("load", () => {
-      this.setState(
-        (state: LayerStateI, props: any) => {
-          return {
-            ...state,
-            layerID: thisLayerID,
-            sourceID: sourceID
-          };
-        },
-        () => {
-          map.addSource(sourceID, {
-            type: "geojson",
-            data: {
-              type: "FeatureCollection",
-              features: []
-            }
-          });
-          map.addLayer({
-            id: thisLayerID,
-            type: "fill",
-            source: sourceID,
-            layout: {},
-            paint: {
-              "fill-color": "#088",
-              "fill-opacity": 0.8
-            }
-          });
-          const thisLayer = map.getLayer(thisLayerID);
-
-          const source: GeoJSONSource = map.getSource(sourceID);
-
-          this.layerDataSource = source;
-
-          this.mapContext = {
-            mapElementContainer: thisLayer,
-            map,
-            layerContext: {
-              addFeature: this.addFeature,
-              removeFeature: this.removeFeature,
-              layerDataSource: this.layerDataSource
-            }
-          };
-          this.forceUpdate();
-        }
-      );
+      this.init();
     });
   }
 
   componentWillUnmount(): void {
     const { map } = this.props;
-    map.removeLayer(this.state.layerID);
-    map.removeSource(this.state.sourceID);
+    try {
+      // map.removeLayer(this.state.layerID);
+      map.removeSource(this.state.sourceID);
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
 

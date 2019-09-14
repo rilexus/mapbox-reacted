@@ -3,22 +3,22 @@ import { withMapContext } from "./Context";
 import Feature from "./Feature";
 import { EventHandler } from "./Types";
 
-interface PolygonProps {
-  coordinates: number[][][];
+interface LineProps {
+  coordinates: number[][];
   click?: EventHandler;
 }
-interface PolygonState {}
+interface LineState {}
 
-class Polygon extends Feature<PolygonProps, PolygonState> {
+class Line extends Feature<LineProps, LineState> {
   constructor(props: any) {
     super(props);
   }
 
   componentDidMount(): void {
     const { coordinates } = this.props;
-    this.addFeature({ type: "Polygon", coordinates }, {});
+    this.addFeature({ type: "LineString", coordinates }, {});
     super.componentDidMount();
   }
 }
 
-export default withMapContext<PolygonProps, any>(Polygon);
+export default withMapContext<LineProps, any>(Line);

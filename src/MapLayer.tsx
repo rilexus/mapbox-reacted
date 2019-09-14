@@ -3,7 +3,7 @@ import {MapContextProvider} from "./Context";
 
 
 export class MapLayer<Props=any,State=any> extends Component<Props | any,any>{
-	mapContext: any;
+	contextValue: any;
 	
 	constructor(props:Props){
 		super(props)
@@ -15,9 +15,9 @@ export class MapLayer<Props=any,State=any> extends Component<Props | any,any>{
 		const {children} = this.props;
 		if (children === null) return null;
 		
-		if (this.mapContext) {
+		if (this.contextValue) {
 			return (
-				<MapContextProvider value={this.mapContext}>
+				<MapContextProvider value={this.contextValue}>
 					{children}
 				</MapContextProvider>
 			)
