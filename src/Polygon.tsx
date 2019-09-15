@@ -1,25 +1,32 @@
 import React from "react";
 import { withMapContext } from "./Context";
-import Feature from "./Feature";
-import { EventHandler } from "./Types";
-import {FillPaint} from "mapbox-gl";
+import Feature, { FeatureProps } from "./Feature";
+import { EventHandler, FeatureTypes, FillPaint } from "./Types";
 
-interface PolygonProps {
+interface PolygonProps extends FeatureProps {
   coordinates: number[][][];
   click?: EventHandler;
-  fillPaint?: FillPaint;
+  paint?: FillPaint;
 }
 interface PolygonState {}
 
 class Polygon extends Feature<PolygonProps, PolygonState> {
   constructor(props: any) {
     super(props);
+    this.featureType = FeatureTypes.Polygon;
   }
 
   componentDidMount(): void {
-    const { coordinates,fillPaint } = this.props;
-    this.addFeature({ type: "Polygon", coordinates }, { }, fillPaint);
+    const { coordinates, paint } = this.props;
+    this.addFeature({ type: this.featureType, coordinates }, {}, paint);
     super.componentDidMount();
+  }
+  componentDidUpdate(
+    prevProps: Readonly<any>,
+    prevState: Readonly<any>,
+    snapshot?: any
+  ): void {
+    super.componentDidUpdate(prevProps, prevState, snapshot);
   }
 }
 

@@ -2,27 +2,36 @@ import React from "react";
 import { withMapContext } from "./Context";
 import { MapLayer } from "./MapLayer";
 import uuid from "uuid";
-import {
+import mapboxgl, {
   BackgroundLayout,
   BackgroundPaint,
-  CircleLayout,
-  CirclePaint,
   FillExtrusionLayout,
   FillExtrusionPaint,
-  FillLayout,
-  FillPaint,
+  RasterLayout,
+  RasterPaint,
+  SymbolLayout,
+  SymbolPaint,
   GeoJSONSource,
   HeatmapLayout,
   HeatmapPaint,
   HillshadeLayout,
   HillshadePaint,
-  LineLayout,
-  LinePaint,
-  RasterLayout,
-  RasterPaint,
-  SymbolLayout,
-  SymbolPaint
+  CirclePaint as MapboxCirclePaint,
+  CircleLayout as MapboxCircleLayout,
+  FillPaint as MapboxFillPaint,
+  LinePaint as MapboxLinePaint,
+  LineLayout as MapboxLineLayout
 } from "mapbox-gl";
+import {
+  CircleLayout,
+  CirclePaint,
+  FeatureTypes,
+  FillLayout,
+  FillPaint,
+  LineLayout,
+  LinePaint
+} from "./Types";
+import { StyleUtils } from "./utils";
 
 interface LayerStateI {
   features: any[];
@@ -42,23 +51,19 @@ interface LayerProps {
   linePaint?: LinePaint;
   lineLayout?: LineLayout;
 }
-export enum FeatureTypes {
-  Polygon = "Polygon",
-  LineString = "LineString",
-  Point = "Point"
-}
 
 export type FeatureStyle = {
   paint?:
     | BackgroundPaint
-    | FillPaint
     | FillExtrusionPaint
-    | LinePaint
     | SymbolPaint
     | RasterPaint
-    | CirclePaint
     | HeatmapPaint
-    | HillshadePaint;
+    | FillPaint
+    | LinePaint
+    | CirclePaint
+    | HillshadePaint
+    | any;
   layout?:
     | BackgroundLayout
     | FillLayout
@@ -158,6 +163,7 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
     const newFeatures = features.filter(
       ({ properties }: any) => properties.id !== id
     );
+    console.log("[Layer] removeFeature: ", id);
     this.setFeatures(newFeatures);
   };
 
@@ -178,7 +184,7 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
       source: sourceID,
       layout: fillLayout || {},
       paint: fillPaint || {},
-      filter: filter || ["==", "$type", "Polygon"]
+      filter: filter || ["==", "_meta-type", "basic-Polygon"]
     });
   };
 
@@ -198,7 +204,7 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
       source: sourceID,
       layout: circleLayout || {},
       paint: circlePaint || {},
-      filter: ["==", "$type", "Point"]
+      filter: filter || ["==", "_meta-type", "basic-Point"]
     });
   };
 
@@ -213,15 +219,15 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
       mapbox: { map }
     } = this.props;
     const layerID = uuid();
-
-    map.addLayer({
+    const layer = {
       id: `line-layer-${layerID}`,
       type: "line",
       source: sourceID,
       layout: lineLayout ? { ...lineLayout } : {},
       paint: linePaint ? { ...linePaint } : {},
-      filter: filter || ["==", "$type", "LineString"]
-    });
+      filter: filter || ["==", "_meta-type", "basic-LineString"]
+    };
+    map.addLayer(layer);
   };
   /**
    * @desc Creates a data source, layers for GeoJson.Feature and passes own context to its children
@@ -232,7 +238,9 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
       fillPaint,
       fillLayout,
       linePaint,
-      lineLayout
+      lineLayout,
+      circlePaint,
+      circleLayout
     } = this.props;
     const sourceID = uuid();
     // layer has own data source, save its id to state
@@ -256,9 +264,21 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
           }
         });
         // add default style passed by props
-        this.addFillLayer(sourceID, fillPaint, {});
-        this.addLineLayer(sourceID, linePaint, lineLayout);
-        this.addCircleLayer(sourceID);
+        this.addFillLayer(
+          sourceID,
+          StyleUtils.transformFillPaint(fillPaint),
+          {}
+        );
+        this.addLineLayer(
+          sourceID,
+          StyleUtils.transformLinePaint(linePaint),
+          lineLayout
+        );
+        this.addCircleLayer(
+          sourceID,
+          StyleUtils.transformCirclePaint(circlePaint),
+          circleLayout
+        );
 
         const source: GeoJSONSource = this.getSource();
         this.layerDataSource = source;
@@ -270,6 +290,7 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
             // passes function to its feature children through context
             addFeature: this.addFeature,
             removeFeature: this.removeFeature,
+            updateFeature: this.updateFeature,
             source: this.layerDataSource
           }
         };
@@ -278,6 +299,67 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
     );
   };
 
+  updateLayerStyle = (layerID: string, paint?: any, layout?: any) => {
+    const {
+      mapbox: { map }
+    } = this.props;
+
+    if (paint) {
+      Object.entries(paint).forEach(([paintProperty, paintValue]) => {
+        map.setPaintProperty(layerID, paintProperty, paintValue);
+      });
+    }
+    if (layout) {
+      Object.entries(layout).forEach(([layoutProperty, layoutValue]) => {
+        map.setLayoutProperty(layerID, layoutProperty, layoutValue);
+      });
+    }
+  };
+
+  updateFeatureStyle = (featureID: string, paint?: any, layout?: any) => {
+    const {
+      mapbox: { map }
+    } = this.props;
+
+    if (paint || layout) {
+      // gets all layers which contains the feature
+      const renderedFeatures = map.queryRenderedFeatures(undefined, {
+        filter: ["==", "_id", `${featureID}`]
+      });
+      renderedFeatures.forEach((fFeature: any) => {
+        const { layer } = fFeature;
+        // get layer with custom style. features are added to multiple layers, the layers with are created in the init function
+        // and those with custom style
+        console.log(fFeature);
+        if (layer.filter.includes(featureID)) {
+          this.updateLayerStyle(layer.id, paint, layout);
+        }
+      });
+    }
+  };
+
+  updateFeature = (
+    featureID: string,
+    coordinates: any,
+    paint: any,
+    layout: any
+  ) => {
+    const {
+      mapbox: { map }
+    } = this.props;
+
+    const oldFeatures = this.getFeatures();
+    this.updateFeatureStyle(featureID, paint, layout);
+
+    const newFeatures = oldFeatures.map((feature: any) => {
+      const { _id } = feature.properties;
+      if (_id === featureID) {
+        feature.geometry.coordinates = [...coordinates];
+      }
+      return feature;
+    });
+    this.setFeatures(newFeatures);
+  };
   componentDidMount(): void {
     super.componentDidMount();
     const {

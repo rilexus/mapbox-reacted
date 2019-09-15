@@ -1,23 +1,48 @@
 import React from "react";
 import uuid from "uuid";
 import { Evented } from "./Evented";
-import { FillPaint } from "mapbox-gl";
+import { FeatureTypes } from "./Types";
+import { StyleUtils } from "./utils";
 
-interface FeaturePropsI {
-  data: any;
+export interface FeatureProps {
+  paint?: any;
+  layout?: any;
+  coordinates: any;
 }
 interface FeatureStateI {
   _id: string;
 }
 export default class Feature<P, State> extends Evented<
-  FeaturePropsI | any,
+  FeatureProps | any,
   FeatureStateI
 > {
+  featureType:FeatureTypes;
   mapElement: any;
 
   constructor(props: any) {
     super(props);
     this.addFeature = this.addFeature.bind(this);
+  }
+
+  componentDidUpdate(
+    prevProps: Readonly<any>,
+    prevState: Readonly<any>,
+    snapshot?: any
+  ): void {
+    const {
+      mapbox: { layer },
+      paint,
+      coordinates,
+      layout
+    } = this.props;
+    if (layer) {
+      layer.updateFeature(
+        this.state._id,
+        coordinates,
+        StyleUtils.transformPaint(this.featureType,paint),
+        layout
+      );
+    }
   }
 
   componentDidMount(): void {
@@ -41,23 +66,35 @@ export default class Feature<P, State> extends Evented<
     if (layer) {
       const _id = uuid();
       // save unique id for the feature
-      this.setState((state: FeatureStateI) => ({
-        ...state,
-        _id
-      }));
-
-      const feature = {
-        type: "Feature",
-        geometry: {
-          ...geometry
-        },
-        properties: {
-          _id,
-          ...properties
+      this.setState(
+        (state: FeatureStateI) => ({
+          ...state,
+          _id
+        }),
+        () => {
+          const hasOwnStyle = !!(paint || layout);
+          const feature = {
+            type: "Feature",
+            geometry: {
+              ...geometry
+            },
+            properties: {
+              ...properties,
+              _id,
+              "_meta-type": `${hasOwnStyle ? "custom" : "basic"}-${
+                geometry.type
+              }`
+            }
+          };
+          // transform style from camelCase to kebab-case
+          let transformedPaint = StyleUtils.transformPaint(
+            geometry.type as FeatureTypes,
+            paint
+          );
+          layer.addFeature(feature, { paint: transformedPaint, layout });
+          this.forceUpdate();
         }
-      };
-      layer.addFeature(feature, { paint, layout });
-      this.forceUpdate();
+      );
     }
   }
 
