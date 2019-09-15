@@ -2,10 +2,12 @@ import React from "react";
 import { withMapContext } from "./Context";
 import Feature from "./Feature";
 import { EventHandler } from "./Types";
+import {FillPaint} from "mapbox-gl";
 
 interface PolygonProps {
   coordinates: number[][][];
   click?: EventHandler;
+  fillPaint?: FillPaint;
 }
 interface PolygonState {}
 
@@ -15,8 +17,8 @@ class Polygon extends Feature<PolygonProps, PolygonState> {
   }
 
   componentDidMount(): void {
-    const { coordinates } = this.props;
-    this.addFeature({ type: "Polygon", coordinates }, {});
+    const { coordinates,fillPaint } = this.props;
+    this.addFeature({ type: "Polygon", coordinates }, { }, fillPaint);
     super.componentDidMount();
   }
 }

@@ -2,10 +2,13 @@ import React from "react";
 import { withMapContext } from "./Context";
 import Feature from "./Feature";
 import { EventHandler } from "./Types";
+import {LineLayout, LinePaint} from "mapbox-gl";
 
 interface LineProps {
   coordinates: number[][];
   click?: EventHandler;
+  linePaint?: LinePaint;
+  lineLayout?: LineLayout;
 }
 interface LineState {}
 
@@ -15,8 +18,8 @@ class Line extends Feature<LineProps, LineState> {
   }
 
   componentDidMount(): void {
-    const { coordinates } = this.props;
-    this.addFeature({ type: "LineString", coordinates }, {});
+    const { coordinates,linePaint, lineLayout } = this.props;
+    this.addFeature({ type: "LineString", coordinates }, {},linePaint,lineLayout);
     super.componentDidMount();
   }
 }

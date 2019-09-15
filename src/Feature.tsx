@@ -1,6 +1,7 @@
 import React from "react";
 import uuid from "uuid";
 import { Evented } from "./Evented";
+import { FillPaint } from "mapbox-gl";
 
 interface FeaturePropsI {
   data: any;
@@ -27,13 +28,19 @@ export default class Feature<P, State> extends Evented<
     super.componentDidMount();
   }
 
-  addFeature(geometry: any, properties: any) {
+  addFeature(
+    geometry: GeoJSON.Geometry,
+    properties: any,
+    paint?: any,
+    layout?: any
+  ) {
     const {
       mapbox: { layer }
     } = this.props;
 
     if (layer) {
       const _id = uuid();
+      // save unique id for the feature
       this.setState((state: FeatureStateI) => ({
         ...state,
         _id
@@ -49,7 +56,7 @@ export default class Feature<P, State> extends Evented<
           ...properties
         }
       };
-      layer.addFeature(feature);
+      layer.addFeature(feature, { paint, layout });
       this.forceUpdate();
     }
   }

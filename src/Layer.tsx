@@ -1,14 +1,27 @@
-import React, { Component } from "react";
-import { MapContextProvider, withMapContext } from "./Context";
+import React from "react";
+import { withMapContext } from "./Context";
 import { MapLayer } from "./MapLayer";
 import uuid from "uuid";
 import {
+  BackgroundLayout,
+  BackgroundPaint,
+  CircleLayout,
   CirclePaint,
+  FillExtrusionLayout,
+  FillExtrusionPaint,
   FillLayout,
   FillPaint,
   GeoJSONSource,
+  HeatmapLayout,
+  HeatmapPaint,
+  HillshadeLayout,
+  HillshadePaint,
   LineLayout,
-  LinePaint
+  LinePaint,
+  RasterLayout,
+  RasterPaint,
+  SymbolLayout,
+  SymbolPaint
 } from "mapbox-gl";
 
 interface LayerStateI {
@@ -16,10 +29,12 @@ interface LayerStateI {
   layerID: string;
   sourceID: string;
 }
+
 interface LayerProps {
   layerName?: string;
 
   circlePaint?: CirclePaint;
+  circleLayout?: CircleLayout;
 
   fillPaint?: FillPaint;
   fillLayout?: FillLayout;
@@ -27,19 +42,50 @@ interface LayerProps {
   linePaint?: LinePaint;
   lineLayout?: LineLayout;
 }
+export enum FeatureTypes {
+  Polygon = "Polygon",
+  LineString = "LineString",
+  Point = "Point"
+}
 
+export type FeatureStyle = {
+  paint?:
+    | BackgroundPaint
+    | FillPaint
+    | FillExtrusionPaint
+    | LinePaint
+    | SymbolPaint
+    | RasterPaint
+    | CirclePaint
+    | HeatmapPaint
+    | HillshadePaint;
+  layout?:
+    | BackgroundLayout
+    | FillLayout
+    | FillExtrusionLayout
+    | LineLayout
+    | SymbolLayout
+    | RasterLayout
+    | CircleLayout
+    | HeatmapLayout
+    | HillshadeLayout;
+};
+
+/**
+ * @desc Manages passed Feature child components: Polygon, Line, Circle etc
+ */
 class Layer extends MapLayer<LayerProps, LayerStateI> {
   contextValue: any;
   layerDataSource: any;
   constructor(props: any) {
     super(props);
 
-    this.state = {
-      features: []
-    };
-
     this.addFeature = this.addFeature.bind(this);
   }
+
+  /**
+   * @desc Returns data source obj for this layer
+   */
   getSource = () => {
     const {
       mapbox: { map }
@@ -48,7 +94,11 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
     return map.getSource(sourceID);
   };
 
-  setFeatures = (features: any[]) => {
+  /**
+   * @desc Sets GeoJson features to the layer data source
+   * @param features
+   */
+  setFeatures = (features: GeoJSON.Feature[]): void => {
     const source = this.getSource();
     if (source) {
       source.setData({
@@ -58,17 +108,52 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
     }
   };
 
-  getFeatures = () => {
+  /**
+   *
+   */
+  getFeatures = (): GeoJSON.Feature[] => {
     const source = this.getSource();
     return (source && source._data.features) || [];
   };
 
-  addFeature(feature: any) {
+  /**
+   * @desc Adds passed feature to Layer data source. If a style prop is given, it add a new layer for this feature.
+   * @param newFeature
+   * @param style
+   */
+  addFeature(newFeature: any, style?: FeatureStyle): void {
+    const { type } = newFeature.geometry;
+    const { _id } = newFeature.properties;
+    const { paint, layout } = style;
+
+    if (paint || layout) {
+      const sourceID = this.getSource().id;
+      const filterByID = ["==", "_id", `${_id}`];
+      switch (type) {
+        case FeatureTypes.Polygon:
+          this.addFillLayer(sourceID, paint as FillPaint, layout, filterByID);
+          break;
+        case FeatureTypes.Point: {
+          this.addCircleLayer(
+            sourceID,
+            paint as CirclePaint,
+            layout,
+            filterByID
+          );
+          break;
+        }
+        case FeatureTypes.LineString: {
+          this.addLineLayer(sourceID, paint as LinePaint, layout, filterByID);
+          break;
+        }
+      }
+    }
+
     const oldFeatures = this.getFeatures();
-    this.setFeatures([...oldFeatures, feature]);
+    this.setFeatures([...oldFeatures, newFeature]);
   }
 
-  removeFeature = (id: string) => {
+  removeFeature = (id: string): void => {
     const features = this.getFeatures();
     const newFeatures = features.filter(
       ({ properties }: any) => properties.id !== id
@@ -76,61 +161,81 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
     this.setFeatures(newFeatures);
   };
 
-  addFillLayer = () => {
+  addFillLayer = (
+    sourceID: string,
+    fillPaint?: FillPaint,
+    fillLayout?: FillLayout,
+    filter?: string[]
+  ): void => {
     const {
-      mapbox: { map },
-      fillPaint
+      mapbox: { map }
     } = this.props;
-
     const layerID = uuid();
+
     map.addLayer({
-      id: layerID,
+      id: `fill-layer-${layerID}`,
       type: "fill",
-      source: this.getSource().id,
-      layout: {},
-      paint: fillPaint ? { ...fillPaint } : {},
-      filter: ["==", "$type", "Polygon"]
+      source: sourceID,
+      layout: fillLayout || {},
+      paint: fillPaint || {},
+      filter: filter || ["==", "$type", "Polygon"]
     });
   };
 
-  addCircleLayer = () => {
+  addCircleLayer = (
+    sourceID: string,
+    circlePaint?: CirclePaint,
+    circleLayout?: CircleLayout,
+    filter?: string[]
+  ): void => {
     const {
-      mapbox: { map },
-      circlePaint
+      mapbox: { map }
     } = this.props;
     const layerID = uuid();
-
     map.addLayer({
-      id: layerID,
+      id: `circle-layer-${layerID}`,
       type: "circle",
-      source: this.getSource().id,
-      paint: circlePaint ? { ...circlePaint } : {},
+      source: sourceID,
+      layout: circleLayout || {},
+      paint: circlePaint || {},
       filter: ["==", "$type", "Point"]
     });
   };
 
-  addLineLayer = () => {
-    const {
-      mapbox: { map },
-      linePaint,
-      lineLayout
-    } = this.props;
-    const layerID = uuid();
-    map.addLayer({
-      id: layerID,
-      type: "line",
-      source: this.getSource().id,
-      layout: lineLayout ? { ...lineLayout } : {},
-      paint: linePaint ? { ...linePaint } : {},
-      filter: ["==", "$type", "LineString"]
-    });
-  };
-
-  init = () => {
+  // adds a line layer to the data source
+  addLineLayer = (
+    sourceID: string,
+    linePaint?: LinePaint,
+    lineLayout?: LineLayout,
+    filter?: string[]
+  ): void => {
     const {
       mapbox: { map }
     } = this.props;
+    const layerID = uuid();
+
+    map.addLayer({
+      id: `line-layer-${layerID}`,
+      type: "line",
+      source: sourceID,
+      layout: lineLayout ? { ...lineLayout } : {},
+      paint: linePaint ? { ...linePaint } : {},
+      filter: filter || ["==", "$type", "LineString"]
+    });
+  };
+  /**
+   * @desc Creates a data source, layers for GeoJson.Feature and passes own context to its children
+   */
+  init = () => {
+    const {
+      mapbox: { map },
+      fillPaint,
+      fillLayout,
+      linePaint,
+      lineLayout
+    } = this.props;
     const sourceID = uuid();
+    // layer has own data source, save its id to state
     this.setState(
       (state: LayerStateI, props: any) => {
         return {
@@ -139,6 +244,10 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
         };
       },
       () => {
+        /**
+         * @desc Layer manages its feature children with help of a data source
+         * @see https://docs.mapbox.com/mapbox-gl-js/example/live-geojson/
+         */
         map.addSource(sourceID, {
           type: "geojson",
           data: {
@@ -146,18 +255,19 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
             features: []
           }
         });
-        this.addFillLayer();
-        this.addCircleLayer();
-        this.addLineLayer();
+        // add default style passed by props
+        this.addFillLayer(sourceID, fillPaint, {});
+        this.addLineLayer(sourceID, linePaint, lineLayout);
+        this.addCircleLayer(sourceID);
 
         const source: GeoJSONSource = this.getSource();
-
         this.layerDataSource = source;
 
         this.contextValue = {
           container: null,
           map,
           layer: {
+            // passes function to its feature children through context
             addFeature: this.addFeature,
             removeFeature: this.removeFeature,
             source: this.layerDataSource
@@ -167,12 +277,14 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
       }
     );
   };
+
   componentDidMount(): void {
     super.componentDidMount();
     const {
       mapbox: { map }
     } = this.props;
     map.on("load", () => {
+      // adds a geojson data source and adds layers for circle, fill, line etc...
       this.init();
     });
   }
