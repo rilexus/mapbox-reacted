@@ -87,7 +87,8 @@ const App: React.FC = () => {
   const token =
     "pk.eyJ1Ijoic3RhbmlzMTk5MiIsImEiOiJjam14cXZsMW4xNjQ0M2tydWRjYTdtZnNnIn0.UKGr3I6KmigqCy8cR5ZHZw";
   const center = [6.0839, 50.7753] as [Lat, Lng];
-
+  const style = "mapbox://styles/stanis1992/ck0l708861x8m1cpqhi1l0p4p";
+  // const style = "mapbox://styles/mapbox/dark-v10";
   useEffect(() => {
     setTimeout(() => {
       setVisible(false);
@@ -102,7 +103,7 @@ const App: React.FC = () => {
         }}
         accessToken={token}
         mapContainerId={"map"}
-        style={"mapbox://styles/mapbox/streets-v11"}
+        style={style}
         center={center}
         zoom={14}
         containerStyle={{

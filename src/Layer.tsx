@@ -330,7 +330,6 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
         const { layer } = fFeature;
         // get layer with custom style. features are added to multiple layers, the layers with are created in the init function
         // and those with custom style
-        console.log(fFeature);
         if (layer.filter.includes(featureID)) {
           this.updateLayerStyle(layer.id, paint, layout);
         }
@@ -344,10 +343,6 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
     paint: any,
     layout: any
   ) => {
-    const {
-      mapbox: { map }
-    } = this.props;
-
     const oldFeatures = this.getFeatures();
     this.updateFeatureStyle(featureID, paint, layout);
 
