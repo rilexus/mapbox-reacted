@@ -73,13 +73,37 @@ export type FeatureStyle = {
 };
 
 /**
- * @desc Manages passed Feature child components: Polygon, Line, Circle etc
+ * @desc Manages passed Feature child components: Polygon, Line, Circle etc. Feature child component uses passed functions through context: addFeature, removeFeature etc to add itself to the layers data source
  */
 class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
   contextValue: any;
   constructor(props: any) {
     super(props);
+    // adds passed geojson feature to data source
     this.addFeature = this.addFeature.bind(this);
+    // removes passed feature from data source
+    this.removeFeature = this.removeFeature.bind(this);
+    // adds layer of type "fill" to the map
+    this.addFillLayer = this.addFillLayer.bind(this);
+    // adds layer of type point to the map
+    this.addCircleLayer = this.addCircleLayer.bind(this);
+    // adds layer of type line to the map
+    this.addLineLayer = this.addLineLayer.bind(this);
+    // removes layer on componentWillUnmount
+    this.removeLayer = this.removeLayer.bind(this);
+    this.removeAllLayers = this.removeAllLayers.bind(this);
+    // creates layers of various types for passed feature children with out own style
+    // provides context to own children. see Feature Component
+    this.init = this.init.bind(this);
+    // (helper function) updates layer paint and layout style
+    // is used when own childs paint and/or layer updates
+    this.updateLayerStyle = this.updateLayerStyle.bind(this);
+    // (helper function) updates feature (child: circle, line etc..) style
+    this.updateFeatureStyle = this.updateFeatureStyle.bind(this);
+    // updates feature coordinates, paint, layout
+    this.updateFeature = this.updateFeature.bind(this);
+
+    // if like to know hoe this class works, start at the componentDidMount function
   }
 
   /**
@@ -119,20 +143,20 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
     this.setFeatures([...oldFeatures, newFeature]);
   }
 
-  removeFeature = (id: string): void => {
+  removeFeature(id: string): void {
     const features = this.getFeatures();
     const newFeatures = features.filter(
       ({ properties }: any) => properties.id !== id
     );
     this.setFeatures(newFeatures);
-  };
+  }
 
-  addFillLayer = (
+  addFillLayer(
     sourceID: string,
     fillPaint?: FillPaint,
     fillLayout?: FillLayout,
     filter?: string[]
-  ): void => {
+  ): void {
     const {
       mapbox: { map }
     } = this.props;
@@ -160,14 +184,14 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
         map.addLayer(layer);
       }
     );
-  };
+  }
 
-  addCircleLayer = (
+  addCircleLayer(
     sourceID: string,
     circlePaint?: CirclePaint,
     circleLayout?: CircleLayout,
     filter?: string[]
-  ): void => {
+  ): void {
     const {
       mapbox: { map }
     } = this.props;
@@ -196,15 +220,14 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
         map.addLayer(layer);
       }
     );
-  };
+  }
 
-  // adds a line layer to the data source
-  addLineLayer = (
+  addLineLayer(
     sourceID: string,
     linePaint?: LinePaint,
     lineLayout?: LineLayout,
     filter?: string[]
-  ): void => {
+  ): void {
     const {
       mapbox: { map }
     } = this.props;
@@ -232,11 +255,11 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
         map.addLayer(layer);
       }
     );
-  };
+  }
   /**
-   * @desc Creates a data source, layers for GeoJson.Feature and passes own context to its children
+   * @desc Creates layers for GeoJson.Feature and passes own context to the children children
    */
-  init = () => {
+  init() {
     const {
       mapbox: { map },
       fillPaint,
@@ -261,6 +284,7 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
         circleLayout
       );
 
+      // takes source from the extended class
       const source: GeoJSONSource = this.getSource();
       this.contextValue = {
         container: null,
@@ -268,33 +292,41 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
         source: source,
         layer: {
           // passes function to its feature children through context
-          addFeature: this.addFeature,
+          addFeature: this.addFeature, // children use this functions to add themselves to the layers data source
           removeFeature: this.removeFeature,
           updateFeature: this.updateFeature
         }
       };
       this.forceUpdate();
     }
-  };
+  }
 
-  updateLayerStyle = (layerID: string, paint?: any, layout?: any) => {
+  updateLayerStyle(layerID: string, paint?: any, layout?: any) {
     const {
       mapbox: { map }
     } = this.props;
 
     if (paint) {
       Object.entries(paint).forEach(([paintProperty, paintValue]) => {
+        // https://docs.mapbox.com/mapbox-gl-js/api/#map#setpaintproperty
         map.setPaintProperty(layerID, paintProperty, paintValue);
       });
     }
     if (layout) {
       Object.entries(layout).forEach(([layoutProperty, layoutValue]) => {
+        // https://docs.mapbox.com/mapbox-gl-js/api/#map#setlayoutproperty
         map.setLayoutProperty(layerID, layoutProperty, layoutValue);
       });
     }
-  };
+  }
 
-  updateFeatureStyle = (featureID: string, paint?: any, layout?: any) => {
+  /**
+   * Finds layer which contains feature with the given id and updates its style
+   * @param featureID
+   * @param paint
+   * @param layout
+   */
+  updateFeatureStyle(featureID: string, paint?: any, layout?: any) {
     const {
       mapbox: { map }
     } = this.props;
@@ -313,14 +345,21 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
         }
       });
     }
-  };
+  }
 
-  updateFeature = (
+  /**
+   * Updates features coordinates and style
+   * @param featureID
+   * @param coordinates
+   * @param paint
+   * @param layout
+   */
+  updateFeature(
     featureID: string,
     coordinates: any,
     paint: any,
     layout: any
-  ) => {
+  ): void {
     const oldFeatures = this.getFeatures();
     this.updateFeatureStyle(featureID, paint, layout);
 
@@ -332,7 +371,7 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
       return feature;
     });
     this.setFeatures(newFeatures);
-  };
+  }
 
   componentDidMount(): void {
     super.componentDidMount();
@@ -345,14 +384,14 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
     });
   }
 
-  removeLayer = (layerID: string) => {
+  removeLayer(layerID: string): void {
     const {
       mapbox: { map }
     } = this.props;
     map.removeLayer(layerID);
-  };
+  }
 
-  removeAllLayers = () => {
+  removeAllLayers(): void {
     const { layerIDs } = this.state;
     const {
       mapbox: { map }
@@ -360,7 +399,7 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
     layerIDs.forEach(id => {
       this.removeLayer(id);
     });
-  };
+  }
 
   componentWillUnmount(): void {
     const {
@@ -368,6 +407,7 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
     } = this.props;
     try {
       this.removeAllLayers();
+      // removes data source
       super.componentWillUnmount();
     } catch (e) {
       console.error(e);

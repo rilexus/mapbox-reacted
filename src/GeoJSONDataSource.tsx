@@ -5,10 +5,11 @@ import { MapContextProvider } from "./Context";
 interface DataSourceStateI {
   sourceID: string;
 }
-abstract class GeoJSONDataSource<P, S> extends Component<
-  P & any,
-  S & DataSourceStateI
-> {
+
+/**
+ * Adds data geoJson data source to the component which extends this class
+ */
+class GeoJSONDataSource<P, S> extends Component<P & any, S & DataSourceStateI> {
   contextValue: any;
 
   constructor(props: any) {
@@ -67,7 +68,6 @@ abstract class GeoJSONDataSource<P, S> extends Component<
               features: []
             }
           });
-          this.forceUpdate();
         }
       );
     });
