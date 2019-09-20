@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Map } from "./Map";
 import Layer from "./Layer";
 import Polygon from "./Polygon";
-import { MapLayer } from "./MapLayer";
 import { Lat, Lng } from "./Types";
 import Line from "./Line";
 import Circle from "./Circle";
@@ -92,7 +91,7 @@ const App: React.FC = () => {
   useEffect(() => {
     setTimeout(() => {
       setVisible(false);
-    }, 5000);
+    }, 2000);
   }, []);
 
   return (
@@ -111,40 +110,43 @@ const App: React.FC = () => {
           width: "500px"
         }}
       >
-        <Layer
-          layerName={"testlayer"}
-          linePaint={{
-            color: "#ed6498",
-            width: 5,
-            opacity: 0.8
-          }}
-          circlePaint={{
-            radius: 5,
-            color: "green"
-          }}
-          fillPaint={{ color: "#088", opacity: 0.8 }}
-          fillLayout={{ visibility: "visible" }}
-        >
-          {/*<MyPol />*/}
-          <MyCircle />
-          <Polygon
-            paint={{ color: "yellow", opacity: 1, opacityTransition: {} }}
-            coordinates={testPolygon2}
-            // click={() => {
-            //   console.log("click");
-            // }}
-          />
-          <Circle coordinates={[6.087253, 50.776521]} />
-          <Line
-            coordinates={[[6.087253, 50.775521], [6.090582, 50.775345]]}
-            paint={{
-              color: "green",
+        {true ? (
+          <Layer
+            layerName={"testlayer"}
+            linePaint={{
+              color: "#ed6498",
               width: 5,
               opacity: 0.8
             }}
-          />
-          <Line coordinates={[[6.084703, 50.772088], [6.084402, 50.774273]]} />
-        </Layer>
+            circlePaint={{
+              radius: 5,
+              color: "green"
+            }}
+            fillPaint={{ color: "#088", opacity: 0.8 }}
+            fillLayout={{ visibility: "visible" }}
+          >
+            {/*<MyCircle />*/}
+            <Polygon
+              paint={{ color: "yellow", opacity: 1, opacityTransition: {} }}
+              coordinates={testPolygon2}
+              // click={() => {
+              //   console.log("click");
+              // }}
+            />
+            {/*<Circle coordinates={[6.087253, 50.776521]} />*/}
+            {/*<Line*/}
+            {/*  coordinates={[[6.087253, 50.775521], [6.090582, 50.775345]]}*/}
+            {/*  paint={{*/}
+            {/*    color: "green",*/}
+            {/*    width: 5,*/}
+            {/*    opacity: 0.8*/}
+            {/*  }}*/}
+            {/*/>*/}
+            {/*<Line*/}
+            {/*  coordinates={[[6.084703, 50.772088], [6.084402, 50.774273]]}*/}
+            {/*/>*/}
+          </Layer>
+        ) : null}
       </Map>
     </div>
   );

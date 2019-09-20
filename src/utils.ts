@@ -41,22 +41,49 @@ function transformPaint(type: FeatureTypes,paint:any) {
 	}
 }
 
-function transformFillPaint(style:{[key:string]:any}) {
+type CSSLkeProperties = {
+	[key:string]: any
+}
+
+function transformFillPaint(style:CSSLkeProperties) {
 	return prepend('fill', splitStyle(style));
 }
-function transformCirclePaint(style:{[key:string]:any}) {
+/**
+ * Returns mapbox compliant line-paint style
+ * @param {CSSLkeProperties} style
+ */
+function transformCirclePaint(style:CSSLkeProperties) {
 	return prepend('circle', splitStyle(style));
 }
-function transformLinePaint(style:{[key:string]:any}) {
+
+/**
+ * @desc Returns mapbox compliant line-paint style
+ * @param {CSSLkeProperties} style
+ */
+function transformLinePaint(style: CSSLkeProperties) {
 	return prepend('line', splitStyle(style));
 }
-function transformHeatmapPaint(style:{[key:string]:any}) {
+
+/**
+ * @desc Returns mapbox compliant heatmap-paint style
+ * @param style
+ */
+function transformHeatmapPaint(style: CSSLkeProperties) {
 	return prepend('heatmap', splitStyle(style));
 }
-function transformHillshadePaint(style:{[key:string]:any}) {
+
+/**
+ * @desc Returns mapbox compliant hillshade-paint style
+ * @param style
+ */
+function transformHillshadePaint(style: CSSLkeProperties) {
 	return prepend('hillshade', splitStyle(style));
 }
-function transformRasterPaint(style:{[key:string]:any}) {
+/**
+ * @desc Returns mapbox compliant raster-paint style
+ * @param style
+ */
+function transformRasterPaint(style: CSSLkeProperties) {
 	return prepend('raster', splitStyle(style));
 }
 

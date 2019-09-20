@@ -16,7 +16,7 @@ export default class Feature<P, State> extends Evented<
   FeatureProps | any,
   FeatureStateI
 > {
-  featureType:FeatureTypes;
+  featureType: FeatureTypes;
   mapElement: any;
 
   constructor(props: any) {
@@ -39,7 +39,7 @@ export default class Feature<P, State> extends Evented<
       layer.updateFeature(
         this.state._id,
         coordinates,
-        StyleUtils.transformPaint(this.featureType,paint),
+        StyleUtils.transformPaint(this.featureType, paint),
         layout
       );
     }
@@ -63,9 +63,11 @@ export default class Feature<P, State> extends Evented<
       mapbox: { layer }
     } = this.props;
 
+    // console.log(this.props);
     if (layer) {
       const _id = uuid();
       // save unique id for the feature
+      // console.log(_id);
       this.setState(
         (state: FeatureStateI) => ({
           ...state,

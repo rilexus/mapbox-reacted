@@ -1,8 +1,9 @@
 import React from "react";
 import { withMapContext } from "./Context";
-import { MapLayer } from "./MapLayer";
+import GeoJSONDataSource from "./GeoJSONDataSource";
+
 import uuid from "uuid";
-import mapboxgl, {
+import {
   BackgroundLayout,
   BackgroundPaint,
   FillExtrusionLayout,
@@ -11,16 +12,11 @@ import mapboxgl, {
   RasterPaint,
   SymbolLayout,
   SymbolPaint,
-  GeoJSONSource,
   HeatmapLayout,
   HeatmapPaint,
   HillshadeLayout,
   HillshadePaint,
-  CirclePaint as MapboxCirclePaint,
-  CircleLayout as MapboxCircleLayout,
-  FillPaint as MapboxFillPaint,
-  LinePaint as MapboxLinePaint,
-  LineLayout as MapboxLineLayout
+  GeoJSONSource
 } from "mapbox-gl";
 import {
   CircleLayout,
@@ -35,7 +31,7 @@ import { StyleUtils } from "./utils";
 
 interface LayerStateI {
   features: any[];
-  layerID: string;
+  layerIDs: string[];
   sourceID: string;
 }
 
@@ -79,47 +75,12 @@ export type FeatureStyle = {
 /**
  * @desc Manages passed Feature child components: Polygon, Line, Circle etc
  */
-class Layer extends MapLayer<LayerProps, LayerStateI> {
+class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
   contextValue: any;
-  layerDataSource: any;
   constructor(props: any) {
     super(props);
-
     this.addFeature = this.addFeature.bind(this);
   }
-
-  /**
-   * @desc Returns data source obj for this layer
-   */
-  getSource = () => {
-    const {
-      mapbox: { map }
-    } = this.props;
-    const { sourceID } = this.state;
-    return map.getSource(sourceID);
-  };
-
-  /**
-   * @desc Sets GeoJson features to the layer data source
-   * @param features
-   */
-  setFeatures = (features: GeoJSON.Feature[]): void => {
-    const source = this.getSource();
-    if (source) {
-      source.setData({
-        type: "FeatureCollection",
-        features: features
-      });
-    }
-  };
-
-  /**
-   *
-   */
-  getFeatures = (): GeoJSON.Feature[] => {
-    const source = this.getSource();
-    return (source && source._data.features) || [];
-  };
 
   /**
    * @desc Adds passed feature to Layer data source. If a style prop is given, it add a new layer for this feature.
@@ -163,7 +124,6 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
     const newFeatures = features.filter(
       ({ properties }: any) => properties.id !== id
     );
-    console.log("[Layer] removeFeature: ", id);
     this.setFeatures(newFeatures);
   };
 
@@ -176,16 +136,27 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
     const {
       mapbox: { map }
     } = this.props;
-    const layerID = uuid();
-
-    map.addLayer({
-      id: `fill-layer-${layerID}`,
-      type: "fill",
-      source: sourceID,
-      layout: fillLayout || {},
-      paint: fillPaint || {},
-      filter: filter || ["==", "_meta-type", "basic-Polygon"]
-    });
+    const layerID = `fill-layer-${uuid()}`;
+    this.setState(
+      state => {
+        const oldLayerIDs = this.state.layerIDs || [];
+        return {
+          ...state,
+          layerIDs: [...oldLayerIDs, layerID]
+        };
+      },
+      () => {
+        const layer = {
+          id: layerID,
+          type: "fill",
+          source: sourceID,
+          layout: fillLayout || {},
+          paint: fillPaint || {},
+          filter: filter || ["==", "_meta-type", "basic-Polygon"]
+        };
+        map.addLayer(layer);
+      }
+    );
   };
 
   addCircleLayer = (
@@ -197,15 +168,29 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
     const {
       mapbox: { map }
     } = this.props;
-    const layerID = uuid();
-    map.addLayer({
-      id: `circle-layer-${layerID}`,
-      type: "circle",
-      source: sourceID,
-      layout: circleLayout || {},
-      paint: circlePaint || {},
-      filter: filter || ["==", "_meta-type", "basic-Point"]
-    });
+
+    const layerID = `circle-layer-${uuid()}`;
+
+    this.setState(
+      state => {
+        const oldLayerIDs = this.state.layerIDs || [];
+        return {
+          ...state,
+          layerIDs: [...oldLayerIDs, layerID]
+        };
+      },
+      () => {
+        const layer = {
+          id: layerID,
+          type: "circle",
+          source: sourceID,
+          layout: circleLayout || {},
+          paint: circlePaint || {},
+          filter: filter || ["==", "_meta-type", "basic-Point"]
+        };
+        map.addLayer(layer);
+      }
+    );
   };
 
   // adds a line layer to the data source
@@ -218,16 +203,28 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
     const {
       mapbox: { map }
     } = this.props;
-    const layerID = uuid();
-    const layer = {
-      id: `line-layer-${layerID}`,
-      type: "line",
-      source: sourceID,
-      layout: lineLayout ? { ...lineLayout } : {},
-      paint: linePaint ? { ...linePaint } : {},
-      filter: filter || ["==", "_meta-type", "basic-LineString"]
-    };
-    map.addLayer(layer);
+
+    const layerID = `line-layer-${uuid()}`;
+    this.setState(
+      state => {
+        const oldLayerIDs = this.state.layerIDs || [];
+        return {
+          ...state,
+          layerIDs: [...oldLayerIDs, layerID]
+        };
+      },
+      () => {
+        const layer = {
+          id: layerID,
+          type: "line",
+          source: sourceID,
+          layout: lineLayout ? { ...lineLayout } : {},
+          paint: linePaint ? { ...linePaint } : {},
+          filter: filter || ["==", "_meta-type", "basic-LineString"]
+        };
+        map.addLayer(layer);
+      }
+    );
   };
   /**
    * @desc Creates a data source, layers for GeoJson.Feature and passes own context to its children
@@ -242,61 +239,34 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
       circlePaint,
       circleLayout
     } = this.props;
-    const sourceID = uuid();
-    // layer has own data source, save its id to state
-    this.setState(
-      (state: LayerStateI, props: any) => {
-        return {
-          ...state,
-          sourceID: sourceID
-        };
-      },
-      () => {
-        /**
-         * @desc Layer manages its feature children with help of a data source
-         * @see https://docs.mapbox.com/mapbox-gl-js/example/live-geojson/
-         */
-        map.addSource(sourceID, {
-          type: "geojson",
-          data: {
-            type: "FeatureCollection",
-            features: []
-          }
-        });
-        // add default style passed by props
-        this.addFillLayer(
-          sourceID,
-          StyleUtils.transformFillPaint(fillPaint),
-          {}
-        );
-        this.addLineLayer(
-          sourceID,
-          StyleUtils.transformLinePaint(linePaint),
-          lineLayout
-        );
-        this.addCircleLayer(
-          sourceID,
-          StyleUtils.transformCirclePaint(circlePaint),
-          circleLayout
-        );
 
-        const source: GeoJSONSource = this.getSource();
-        this.layerDataSource = source;
-
-        this.contextValue = {
-          container: null,
-          map,
-          layer: {
-            // passes function to its feature children through context
-            addFeature: this.addFeature,
-            removeFeature: this.removeFeature,
-            updateFeature: this.updateFeature,
-            source: this.layerDataSource
-          }
-        };
-        this.forceUpdate();
-      }
+    const { sourceID } = this.state;
+    // create layers with styles passed to layer props => styles all features with out own style
+    this.addFillLayer(sourceID, StyleUtils.transformFillPaint(fillPaint), {});
+    this.addLineLayer(
+      sourceID,
+      StyleUtils.transformLinePaint(linePaint),
+      lineLayout
     );
+    this.addCircleLayer(
+      sourceID,
+      StyleUtils.transformCirclePaint(circlePaint),
+      circleLayout
+    );
+
+    const source: GeoJSONSource = this.getSource();
+    this.contextValue = {
+      container: null,
+      map,
+      source: source,
+      layer: {
+        // passes function to its feature children through context
+        addFeature: this.addFeature,
+        removeFeature: this.removeFeature,
+        updateFeature: this.updateFeature
+      }
+    };
+    this.forceUpdate();
   };
 
   updateLayerStyle = (layerID: string, paint?: any, layout?: any) => {
@@ -328,9 +298,9 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
       });
       renderedFeatures.forEach((fFeature: any) => {
         const { layer } = fFeature;
-        // get layer with custom style. features are added to multiple layers, the layers with are created in the init function
-        // and those with custom style
         if (layer.filter.includes(featureID)) {
+          // features are added to multiple layers, the layers which are created in the init function
+          // and those with custom style
           this.updateLayerStyle(layer.id, paint, layout);
         }
       });
@@ -355,22 +325,38 @@ class Layer extends MapLayer<LayerProps, LayerStateI> {
     });
     this.setFeatures(newFeatures);
   };
+
   componentDidMount(): void {
     super.componentDidMount();
     const {
       mapbox: { map }
     } = this.props;
     map.on("load", () => {
-      // adds a geojson data source and adds layers for circle, fill, line etc...
+      // adds layers for circle, fill, line etc...
       this.init();
     });
   }
 
+  removeLayer = (layerID: string) => {
+    const {
+      mapbox: { map }
+    } = this.props;
+    map.removeLayer(layerID);
+  };
+
+  removeAllLayers = () => {
+    const { layerIDs } = this.state;
+    layerIDs.forEach(id => {
+      this.removeLayer(id);
+    });
+  };
+
   componentWillUnmount(): void {
-    const { map } = this.props;
+    const {
+      mapbox: { map }
+    } = this.props;
     try {
-      // map.removeLayer(this.state.layerID);
-      map.removeSource(this.state.sourceID);
+      // TODO: remove layers on unmount
     } catch (e) {
       console.error(e);
     }
