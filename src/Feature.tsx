@@ -50,6 +50,11 @@ export default class Feature<P, State> extends Evented<
       mapbox: { map }
     } = this.props;
     this.mapElement = map;
+
+    // map.on("click", layerID, (e: any) => {
+    //   // console.log(e);
+    // });
+
     super.componentDidMount();
   }
 
@@ -91,7 +96,11 @@ export default class Feature<P, State> extends Evented<
             geometry.type as FeatureTypes,
             paint
           );
-          layer.addFeature(feature, { paint: transformedPaint, layout });
+          layer.addFeature(
+            feature,
+            { paint: transformedPaint, layout },
+            this.extractedEvents
+          );
           this.forceUpdate();
         }
       );
@@ -99,7 +108,9 @@ export default class Feature<P, State> extends Evented<
   }
 
   componentWillUnmount(): void {
-    const { layer } = this.props;
+    const {
+      mapbox: { layer }
+    } = this.props;
     if (layer) {
       layer.removeFeature(this.state._id);
     }

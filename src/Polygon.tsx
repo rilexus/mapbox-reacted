@@ -28,6 +28,9 @@ class Polygon extends Feature<PolygonProps, PolygonState> {
   ): void {
     super.componentDidUpdate(prevProps, prevState, snapshot);
   }
+  componentWillUnmount(): void {
+    super.componentWillUnmount();
+  }
 }
 
 export default withMapContext<PolygonProps, any>(Polygon);

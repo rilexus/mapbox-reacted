@@ -2,7 +2,7 @@ import {FeatureTypes} from "./Types";
 
 function splitStyle(style: { [key: string]: any }) {
 	// split by UpperCase letter, to lower case and join with "-"
-	if (!style) return
+	if (!style) return;
 	return Object.entries(style).reduce((acc, [prop, value]) => {
 		if (prop === 'visibility') return  {...acc,[prop]:value};
 		const normProps = prop
@@ -17,7 +17,7 @@ function splitStyle(style: { [key: string]: any }) {
 }
 
 function prepend(prefix:string,toStyle:{[key:string]:any}) {
-	if (!toStyle) return ;
+	if (!toStyle) return;
 	return Object.entries(toStyle).reduce((acc, [prop, value]) => {
 		if (prop === 'visibility') return  {...acc,[prop]:value};
 		return {
@@ -27,7 +27,7 @@ function prepend(prefix:string,toStyle:{[key:string]:any}) {
 	}, {});
 }
 function transformPaint(type: FeatureTypes,paint:any) {
-	if (!paint) return;
+	if (!paint) return ;
 	switch (type) {
 		case FeatureTypes.LineString:{
 			return StyleUtils.transformLinePaint(paint);

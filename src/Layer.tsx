@@ -21,6 +21,7 @@ import {
 import {
   CircleLayout,
   CirclePaint,
+  EventsObject,
   FeatureTypes,
   FillLayout,
   FillPaint,
@@ -109,33 +110,53 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
   }
 
   /**
-   * @desc Adds passed feature to Layer data source. If a style prop is given, it add a new layer for this feature.
+   * @desc Adds passed feature to Layer data source. If a style or eventsObject prop is given, it add a new/unique layer for this feature.
    * @param newFeature
    * @param style
    */
-  addFeature(newFeature: any, style?: FeatureStyle): void {
+  addFeature(
+    newFeature: any,
+    style?: FeatureStyle,
+    eventHandlers?: EventsObject
+  ): void {
     const { type } = newFeature.geometry;
     const { _id } = newFeature.properties;
     const { paint, layout } = style;
 
-    if (paint || layout) {
+    if (paint || layout || eventHandlers) {
       const sourceID = this.getSource().id;
       const filterByID = ["==", "_id", `${_id}`];
       switch (type) {
         case FeatureTypes.Polygon:
-          this.addFillLayer(sourceID, paint as FillPaint, layout, filterByID);
+          this.addFillLayer(
+            sourceID,
+            (paint as FillPaint) ||
+              StyleUtils.transformFillPaint(this.props.fillPaint),
+            layout,
+            filterByID,
+            eventHandlers
+          );
           break;
         case FeatureTypes.Point: {
           this.addCircleLayer(
             sourceID,
-            paint as CirclePaint,
+            (paint as CirclePaint) ||
+              StyleUtils.transformCirclePaint(this.props.circlePaint),
             layout,
-            filterByID
+            filterByID,
+            eventHandlers
           );
           break;
         }
         case FeatureTypes.LineString: {
-          this.addLineLayer(sourceID, paint as LinePaint, layout, filterByID);
+          this.addLineLayer(
+            sourceID,
+            (paint as LinePaint) ||
+              StyleUtils.transformLinePaint(this.props.linePaint),
+            layout || StyleUtils.transformLinePaint(this.props.lineLayout),
+            filterByID,
+            eventHandlers
+          );
           break;
         }
       }
@@ -147,9 +168,9 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
 
   removeFeature(id: string): void {
     const features = this.getFeatures();
-    const newFeatures = features.filter(
-      ({ properties }: any) => properties.id !== id
-    );
+    const newFeatures = features.filter(({ properties }: any) => {
+      return properties._id !== id;
+    });
     this.setFeatures(newFeatures);
   }
 
@@ -157,7 +178,8 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
     sourceID: string,
     fillPaint?: FillPaint,
     fillLayout?: FillLayout,
-    filter?: string[]
+    filter?: string[],
+    eventHandlers?: any
   ): void {
     const {
       mapbox: { map }
@@ -175,6 +197,14 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
         };
       },
       () => {
+        if (eventHandlers) {
+          Object.entries(eventHandlers).forEach(
+            ([eventType, eventHandlerFunction]) => {
+              map.on(eventType, layerID, eventHandlerFunction);
+            }
+          );
+        }
+
         const layer = {
           id: layerID,
           type: "fill",
@@ -193,7 +223,8 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
     sourceID: string,
     circlePaint?: CirclePaint,
     circleLayout?: CircleLayout,
-    filter?: string[]
+    filter?: string[],
+    eventHandlers?: any
   ): void {
     const {
       mapbox: { map }
@@ -212,6 +243,14 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
         };
       },
       () => {
+        if (eventHandlers) {
+          Object.entries(eventHandlers).forEach(
+            ([eventType, eventHandlerFunction]) => {
+              map.on(eventType, layerID, eventHandlerFunction);
+            }
+          );
+        }
+
         const layer = {
           id: layerID,
           type: "circle",
@@ -229,7 +268,8 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
     sourceID: string,
     linePaint?: LinePaint,
     lineLayout?: LineLayout,
-    filter?: string[]
+    filter?: string[],
+    eventHandlers?: any
   ): void {
     const {
       mapbox: { map }
@@ -247,6 +287,14 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
         };
       },
       () => {
+        if (eventHandlers) {
+          Object.entries(eventHandlers).forEach(
+            ([eventType, eventHandlerFunction]) => {
+              map.on(eventType, layerID, eventHandlerFunction);
+            }
+          );
+        }
+
         const layer = {
           id: layerID,
           type: "line",

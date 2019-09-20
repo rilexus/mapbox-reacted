@@ -2,8 +2,23 @@ import React, { Component } from "react";
 import { EventHandler, EventsObject, EventType } from "./Types";
 
 export class Evented<Props, State> extends Component<any, any> {
-  mapEventTypes = ["mousemove", "mouseleave", "load", "click", "mouseover"];
+  mapEventTypes = [
+    "dblclick",
+    "mouseenter",
+    "mouseout",
+    "contextmenu",
+    "touchstart",
+    "touchend",
+    "touchcancel",
+    "mouseup",
+    "mousemove",
+    "mouseleave",
+    "mousedown",
+    "click",
+    "mouseover"
+  ];
   mapElement: any;
+  // contains all event functions (click, mouseleave, mouseover, ... ) passed to component which extends this class
   extractedEvents: EventsObject;
 
   constructor(props: Props) {
@@ -14,10 +29,12 @@ export class Evented<Props, State> extends Component<any, any> {
   }
 
   componentDidMount(): void {
-    this.bindEventProps(this.mapElement);
+    // this.bindEventProps(this.mapElement);
   }
 
   extractMapEventProps() {
+    // takes all event functions in mapEventTypes passed to the component in props
+    // and saves it in the extractedEvents Object
     return Object.keys(this.props).reduce((acc: any, propName) => {
       if (
         this.props[propName] !== null &&

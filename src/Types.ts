@@ -3,7 +3,7 @@ import {Expression, Map, StyleFunction, Transition} from "mapbox-gl";
 export type Lat = number;
 export type Lng = number;
 export type EventType = string;
-export type EventHandler = (event: Event) => void;
+export type EventHandler = (event: any) => void;
 export type EventsObject = { [key: string]: EventHandler };
 
 export interface Layer {

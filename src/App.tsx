@@ -54,6 +54,9 @@ function MyCircle() {
   return (
     <Circle
       coordinates={coords}
+      click={e => {
+        console.log("my circle: ", e);
+      }}
       paint={{
         radius: radius,
         color: "red"
@@ -95,7 +98,7 @@ const App: React.FC = () => {
           layerName={"testlayer"}
           linePaint={{
             color: "#ed6498",
-            width: 5,
+            width: 2,
             opacity: 0.8
           }}
           circlePaint={{
@@ -106,15 +109,24 @@ const App: React.FC = () => {
           fillLayout={{ visibility: "visible" }}
         >
           <MyCircle />
+
           <Polygon
-            paint={{ color: "yellow", opacity: 1, opacityTransition: {} }}
+            // paint={{ color: "yellow", opacity: 1, opacityTransition: {} }}
             coordinates={testPolygon2}
-            // click={() => {
-            //   console.log("click");
-            // }}
+            click={e => {
+              console.log("click polygon: ", e, e.features);
+            }}
           />
-          <Circle coordinates={[6.087253, 50.776521]} />
+          <Circle
+            click={e => {
+              console.log("basic: ", e.features);
+            }}
+            coordinates={[6.087253, 50.776521]}
+          />
           <Line
+            click={e => {
+              console.log("line: ", e);
+            }}
             coordinates={[[6.087253, 50.775521], [6.090582, 50.775345]]}
             paint={{
               color: "green",
