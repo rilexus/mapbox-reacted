@@ -24,9 +24,6 @@ const testPolygon2 = [
     [6.084402, 50.774273]
   ]
 ];
-function MyPol() {
-  return <Polygon coordinates={testPolygon1} />;
-}
 
 function MyCircle() {
   const [coords, setCoords] = useState<any>([6.087253, 50.775521]);
@@ -64,23 +61,7 @@ function MyCircle() {
     />
   );
 }
-function Count() {
-  const [count, setCount] = useState(-1);
-  const [id, setId] = useState(-1);
-  function update() {
-    setCount(count + 1);
-  }
 
-  console.log(count);
-  useEffect(() => {
-    const id = setInterval(update, 500);
-    return () => {
-      clearInterval(id);
-    };
-  }, [count]);
-
-  return <div></div>;
-}
 const App: React.FC = () => {
   const [visible, setVisible] = useState(true);
   const token =
@@ -107,46 +88,42 @@ const App: React.FC = () => {
         zoom={14}
         containerStyle={{
           height: "500px",
-          width: "500px"
+          width: "700px"
         }}
       >
-        {true ? (
-          <Layer
-            layerName={"testlayer"}
-            linePaint={{
-              color: "#ed6498",
+        <Layer
+          layerName={"testlayer"}
+          linePaint={{
+            color: "#ed6498",
+            width: 5,
+            opacity: 0.8
+          }}
+          circlePaint={{
+            radius: 5,
+            color: "green"
+          }}
+          fillPaint={{ color: "#088", opacity: 0.8 }}
+          fillLayout={{ visibility: "visible" }}
+        >
+          <MyCircle />
+          <Polygon
+            paint={{ color: "yellow", opacity: 1, opacityTransition: {} }}
+            coordinates={testPolygon2}
+            // click={() => {
+            //   console.log("click");
+            // }}
+          />
+          <Circle coordinates={[6.087253, 50.776521]} />
+          <Line
+            coordinates={[[6.087253, 50.775521], [6.090582, 50.775345]]}
+            paint={{
+              color: "green",
               width: 5,
               opacity: 0.8
             }}
-            circlePaint={{
-              radius: 5,
-              color: "green"
-            }}
-            fillPaint={{ color: "#088", opacity: 0.8 }}
-            fillLayout={{ visibility: "visible" }}
-          >
-            {/*<MyCircle />*/}
-            <Polygon
-              paint={{ color: "yellow", opacity: 1, opacityTransition: {} }}
-              coordinates={testPolygon2}
-              // click={() => {
-              //   console.log("click");
-              // }}
-            />
-            {/*<Circle coordinates={[6.087253, 50.776521]} />*/}
-            {/*<Line*/}
-            {/*  coordinates={[[6.087253, 50.775521], [6.090582, 50.775345]]}*/}
-            {/*  paint={{*/}
-            {/*    color: "green",*/}
-            {/*    width: 5,*/}
-            {/*    opacity: 0.8*/}
-            {/*  }}*/}
-            {/*/>*/}
-            {/*<Line*/}
-            {/*  coordinates={[[6.084703, 50.772088], [6.084402, 50.774273]]}*/}
-            {/*/>*/}
-          </Layer>
-        ) : null}
+          />
+          <Line coordinates={[[6.084703, 50.772088], [6.084402, 50.774273]]} />
+        </Layer>
       </Map>
     </div>
   );

@@ -137,12 +137,15 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
       mapbox: { map }
     } = this.props;
     const layerID = `fill-layer-${uuid()}`;
+
     this.setState(
       state => {
-        const oldLayerIDs = this.state.layerIDs || [];
+        const oldLayerIDs = state.layerIDs || [];
+        const newLayerIds = [...oldLayerIDs, layerID];
+
         return {
           ...state,
-          layerIDs: [...oldLayerIDs, layerID]
+          layerIDs: newLayerIds
         };
       },
       () => {
@@ -173,10 +176,12 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
 
     this.setState(
       state => {
-        const oldLayerIDs = this.state.layerIDs || [];
+        const oldLayerIDs = state.layerIDs || [];
+        const newLayerIds = [...oldLayerIDs, layerID];
+
         return {
           ...state,
-          layerIDs: [...oldLayerIDs, layerID]
+          layerIDs: newLayerIds
         };
       },
       () => {
@@ -205,12 +210,14 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
     } = this.props;
 
     const layerID = `line-layer-${uuid()}`;
+
     this.setState(
       state => {
-        const oldLayerIDs = this.state.layerIDs || [];
+        const oldLayerIDs = state.layerIDs || [];
+        const newLayerIds = [...oldLayerIDs, layerID];
         return {
           ...state,
-          layerIDs: [...oldLayerIDs, layerID]
+          layerIDs: newLayerIds
         };
       },
       () => {
@@ -239,34 +246,35 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
       circlePaint,
       circleLayout
     } = this.props;
+    if (this.state) {
+      const { sourceID } = this.state;
+      // create layers with styles passed to layer props => styles all features with out own style
+      this.addFillLayer(sourceID, StyleUtils.transformFillPaint(fillPaint), {});
+      this.addLineLayer(
+        sourceID,
+        StyleUtils.transformLinePaint(linePaint),
+        lineLayout
+      );
+      this.addCircleLayer(
+        sourceID,
+        StyleUtils.transformCirclePaint(circlePaint),
+        circleLayout
+      );
 
-    const { sourceID } = this.state;
-    // create layers with styles passed to layer props => styles all features with out own style
-    this.addFillLayer(sourceID, StyleUtils.transformFillPaint(fillPaint), {});
-    this.addLineLayer(
-      sourceID,
-      StyleUtils.transformLinePaint(linePaint),
-      lineLayout
-    );
-    this.addCircleLayer(
-      sourceID,
-      StyleUtils.transformCirclePaint(circlePaint),
-      circleLayout
-    );
-
-    const source: GeoJSONSource = this.getSource();
-    this.contextValue = {
-      container: null,
-      map,
-      source: source,
-      layer: {
-        // passes function to its feature children through context
-        addFeature: this.addFeature,
-        removeFeature: this.removeFeature,
-        updateFeature: this.updateFeature
-      }
-    };
-    this.forceUpdate();
+      const source: GeoJSONSource = this.getSource();
+      this.contextValue = {
+        container: null,
+        map,
+        source: source,
+        layer: {
+          // passes function to its feature children through context
+          addFeature: this.addFeature,
+          removeFeature: this.removeFeature,
+          updateFeature: this.updateFeature
+        }
+      };
+      this.forceUpdate();
+    }
   };
 
   updateLayerStyle = (layerID: string, paint?: any, layout?: any) => {
@@ -346,6 +354,9 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
 
   removeAllLayers = () => {
     const { layerIDs } = this.state;
+    const {
+      mapbox: { map }
+    } = this.props;
     layerIDs.forEach(id => {
       this.removeLayer(id);
     });
@@ -356,7 +367,8 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
       mapbox: { map }
     } = this.props;
     try {
-      // TODO: remove layers on unmount
+      this.removeAllLayers();
+      super.componentWillUnmount();
     } catch (e) {
       console.error(e);
     }

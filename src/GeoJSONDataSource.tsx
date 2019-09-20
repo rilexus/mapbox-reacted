@@ -47,10 +47,6 @@ abstract class GeoJSONDataSource<P, S> extends Component<
   }
 
   componentDidMount(): void {
-    /**
-     * @desc Layer manages its feature children with help of a data source
-     * @see https://docs.mapbox.com/mapbox-gl-js/example/live-geojson/
-     */
     const {
       mapbox: { map }
     } = this.props;
