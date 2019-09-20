@@ -73,7 +73,9 @@ export type FeatureStyle = {
 };
 
 /**
- * @desc Manages passed Feature child components: Polygon, Line, Circle etc. Feature child component uses passed functions through context: addFeature, removeFeature etc to add itself to the layers data source
+ * @desc Manages passed Feature child components: Polygon, Line, Circle etc.
+ * Feature child component uses passed functions through context: addFeature, removeFeature etc to add itself to the layers data source
+ * NOTE: currently layers for children with own style are not removed if the child unmounts. This can cause performance issues!
  */
 class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
   contextValue: any;
@@ -179,6 +181,7 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
           source: sourceID,
           layout: fillLayout || {},
           paint: fillPaint || {},
+          // this style layer will be applied only to feature with _meta-type: basic-Polygon property in it see: Feature class component
           filter: filter || ["==", "_meta-type", "basic-Polygon"]
         };
         map.addLayer(layer);

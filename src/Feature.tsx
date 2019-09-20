@@ -63,11 +63,9 @@ export default class Feature<P, State> extends Evented<
       mapbox: { layer }
     } = this.props;
 
-    // console.log(this.props);
     if (layer) {
       const _id = uuid();
       // save unique id for the feature
-      // console.log(_id);
       this.setState(
         (state: FeatureStateI) => ({
           ...state,
