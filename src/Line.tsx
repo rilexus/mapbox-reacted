@@ -7,8 +7,6 @@ import {EventHandler, FeatureTypes, LineLayout, LinePaint} from "./Types";
 interface LineProps extends FeatureProps{
   coordinates: number[][];
   click?: EventHandler;
-  paint?: LinePaint;
-  layout?: LineLayout;
 }
 interface LineState {}
 

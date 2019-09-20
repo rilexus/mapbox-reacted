@@ -50,11 +50,6 @@ export default class Feature<P, State> extends Evented<
       mapbox: { map }
     } = this.props;
     this.mapElement = map;
-
-    // map.on("click", layerID, (e: any) => {
-    //   // console.log(e);
-    // });
-
     super.componentDidMount();
   }
 
@@ -91,15 +86,9 @@ export default class Feature<P, State> extends Evented<
               }`
             }
           };
-          // transform style from camelCase to kebab-case
-          let transformedPaint = StyleUtils.transformPaint(
-            geometry.type as FeatureTypes,
-            paint
-          );
           layer.addFeature(
             feature,
-            { paint: transformedPaint, layout },
-            this.extractedEvents
+            // this.extractedEvents
           );
           this.forceUpdate();
         }

@@ -47,6 +47,9 @@ interface LayerProps {
 
   linePaint?: LinePaint;
   lineLayout?: LineLayout;
+
+  type: "fill" | "point" | "symbol" | "line";
+  filter?: string[];
 }
 
 export type FeatureStyle = {
@@ -86,12 +89,6 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
     this.addFeature = this.addFeature.bind(this);
     // removes passed feature from data source
     this.removeFeature = this.removeFeature.bind(this);
-    // adds layer of type "fill" to the map
-    this.addFillLayer = this.addFillLayer.bind(this);
-    // adds layer of type point to the map
-    this.addCircleLayer = this.addCircleLayer.bind(this);
-    // adds layer of type line to the map
-    this.addLineLayer = this.addLineLayer.bind(this);
     // removes layer on componentWillUnmount
     this.removeLayer = this.removeLayer.bind(this);
     this.removeAllLayers = this.removeAllLayers.bind(this);
@@ -114,54 +111,7 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
    * @param newFeature
    * @param style
    */
-  addFeature(
-    newFeature: any,
-    style?: FeatureStyle,
-    eventHandlers?: EventsObject
-  ): void {
-    const { type } = newFeature.geometry;
-    const { _id } = newFeature.properties;
-    const { paint, layout } = style;
-
-    if (paint || layout || eventHandlers) {
-      const sourceID = this.getSource().id;
-      const filterByID = ["==", "_id", `${_id}`];
-      switch (type) {
-        case FeatureTypes.Polygon:
-          this.addFillLayer(
-            sourceID,
-            (paint as FillPaint) ||
-              StyleUtils.transformFillPaint(this.props.fillPaint),
-            layout,
-            filterByID,
-            eventHandlers
-          );
-          break;
-        case FeatureTypes.Point: {
-          this.addCircleLayer(
-            sourceID,
-            (paint as CirclePaint) ||
-              StyleUtils.transformCirclePaint(this.props.circlePaint),
-            layout,
-            filterByID,
-            eventHandlers
-          );
-          break;
-        }
-        case FeatureTypes.LineString: {
-          this.addLineLayer(
-            sourceID,
-            (paint as LinePaint) ||
-              StyleUtils.transformLinePaint(this.props.linePaint),
-            layout || StyleUtils.transformLinePaint(this.props.lineLayout),
-            filterByID,
-            eventHandlers
-          );
-          break;
-        }
-      }
-    }
-
+  addFeature(newFeature: any): void {
     const oldFeatures = this.getFeatures();
     this.setFeatures([...oldFeatures, newFeature]);
   }
@@ -173,140 +123,136 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
     });
     this.setFeatures(newFeatures);
   }
+  //
+  // addFillLayer(sourceID: string, filter?: string[], eventHandlers?: any): void {
+  //   const {
+  //     mapbox: { map },
+  //     fillPaint,
+  //     fillLayout
+  //   } = this.props;
+  //   const layerID = `fill-layer-${uuid()}`;
+  //
+  //   this.setState(
+  //     state => {
+  //       const oldLayerIDs = state.layerIDs || [];
+  //       const newLayerIds = [...oldLayerIDs, layerID];
+  //
+  //       return {
+  //         ...state,
+  //         layerIDs: newLayerIds
+  //       };
+  //     },
+  //     () => {
+  //       if (eventHandlers) {
+  //         Object.entries(eventHandlers).forEach(
+  //           ([eventType, eventHandlerFunction]) => {
+  //             map.on(eventType, layerID, eventHandlerFunction);
+  //           }
+  //         );
+  //       }
+  //
+  //       const layer = {
+  //         id: layerID,
+  //         type: "fill",
+  //         source: sourceID,
+  //         layout: fillLayout || {},
+  //         paint: fillPaint || {},
+  //         // this style layer will be applied only to feature with _meta-type: basic-Polygon property in it see: Feature class component
+  //         filter: filter || ["==", "_meta-type", "basic-Polygon"]
+  //       };
+  //       map.addLayer(layer);
+  //     }
+  //   );
+  // }
 
-  addFillLayer(
-    sourceID: string,
-    fillPaint?: FillPaint,
-    fillLayout?: FillLayout,
-    filter?: string[],
-    eventHandlers?: any
-  ): void {
-    const {
-      mapbox: { map }
-    } = this.props;
-    const layerID = `fill-layer-${uuid()}`;
+  // addCircleLayer(
+  //   sourceID: string,
+  //   filter?: string[],
+  //   eventHandlers?: any
+  // ): void {
+  //   const {
+  //     mapbox: { map },
+  //     circlePaint,
+  //     circleLayout,
+  //   } = this.props;
+  //
+  //   const layerID = `circle-layer-${uuid()}`;
+  //
+  //   this.setState(
+  //     state => {
+  //       const oldLayerIDs = state.layerIDs || [];
+  //       const newLayerIds = [...oldLayerIDs, layerID];
+  //
+  //       return {
+  //         ...state,
+  //         layerIDs: newLayerIds
+  //       };
+  //     },
+  //     () => {
+  //       // if (eventHandlers) {
+  //       //   Object.entries(eventHandlers).forEach(
+  //       //     ([eventType, eventHandlerFunction]) => {
+  //       //       map.on(eventType, layerID, eventHandlerFunction);
+  //       //     }
+  //       //   );
+  //       // }
+  //
+  //       const layer = {
+  //         id: layerID,
+  //         type: "circle",
+  //         source: sourceID,
+  //         layout: circleLayout || {},
+  //         paint: circlePaint || {},
+  //         filter: filter || ["==", "_meta-type", "basic-Point"]
+  //       };
+  //       map.addLayer(layer);
+  //     }
+  //   );
+  // }
 
-    this.setState(
-      state => {
-        const oldLayerIDs = state.layerIDs || [];
-        const newLayerIds = [...oldLayerIDs, layerID];
-
-        return {
-          ...state,
-          layerIDs: newLayerIds
-        };
-      },
-      () => {
-        if (eventHandlers) {
-          Object.entries(eventHandlers).forEach(
-            ([eventType, eventHandlerFunction]) => {
-              map.on(eventType, layerID, eventHandlerFunction);
-            }
-          );
-        }
-
-        const layer = {
-          id: layerID,
-          type: "fill",
-          source: sourceID,
-          layout: fillLayout || {},
-          paint: fillPaint || {},
-          // this style layer will be applied only to feature with _meta-type: basic-Polygon property in it see: Feature class component
-          filter: filter || ["==", "_meta-type", "basic-Polygon"]
-        };
-        map.addLayer(layer);
-      }
-    );
-  }
-
-  addCircleLayer(
-    sourceID: string,
-    circlePaint?: CirclePaint,
-    circleLayout?: CircleLayout,
-    filter?: string[],
-    eventHandlers?: any
-  ): void {
-    const {
-      mapbox: { map }
-    } = this.props;
-
-    const layerID = `circle-layer-${uuid()}`;
-
-    this.setState(
-      state => {
-        const oldLayerIDs = state.layerIDs || [];
-        const newLayerIds = [...oldLayerIDs, layerID];
-
-        return {
-          ...state,
-          layerIDs: newLayerIds
-        };
-      },
-      () => {
-        if (eventHandlers) {
-          Object.entries(eventHandlers).forEach(
-            ([eventType, eventHandlerFunction]) => {
-              map.on(eventType, layerID, eventHandlerFunction);
-            }
-          );
-        }
-
-        const layer = {
-          id: layerID,
-          type: "circle",
-          source: sourceID,
-          layout: circleLayout || {},
-          paint: circlePaint || {},
-          filter: filter || ["==", "_meta-type", "basic-Point"]
-        };
-        map.addLayer(layer);
-      }
-    );
-  }
-
-  addLineLayer(
-    sourceID: string,
-    linePaint?: LinePaint,
-    lineLayout?: LineLayout,
-    filter?: string[],
-    eventHandlers?: any
-  ): void {
-    const {
-      mapbox: { map }
-    } = this.props;
-
-    const layerID = `line-layer-${uuid()}`;
-
-    this.setState(
-      state => {
-        const oldLayerIDs = state.layerIDs || [];
-        const newLayerIds = [...oldLayerIDs, layerID];
-        return {
-          ...state,
-          layerIDs: newLayerIds
-        };
-      },
-      () => {
-        if (eventHandlers) {
-          Object.entries(eventHandlers).forEach(
-            ([eventType, eventHandlerFunction]) => {
-              map.on(eventType, layerID, eventHandlerFunction);
-            }
-          );
-        }
-
-        const layer = {
-          id: layerID,
-          type: "line",
-          source: sourceID,
-          layout: lineLayout ? { ...lineLayout } : {},
-          paint: linePaint ? { ...linePaint } : {},
-          filter: filter || ["==", "_meta-type", "basic-LineString"]
-        };
-        map.addLayer(layer);
-      }
-    );
-  }
+  // addLineLayer(
+  //   sourceID: string,
+  //   linePaint?: LinePaint,
+  //   lineLayout?: LineLayout,
+  //   filter?: string[],
+  //   eventHandlers?: any
+  // ): void {
+  //   const {
+  //     mapbox: { map }
+  //   } = this.props;
+  //
+  //   const layerID = `line-layer-${uuid()}`;
+  //
+  //   this.setState(
+  //     state => {
+  //       const oldLayerIDs = state.layerIDs || [];
+  //       const newLayerIds = [...oldLayerIDs, layerID];
+  //       return {
+  //         ...state,
+  //         layerIDs: newLayerIds
+  //       };
+  //     },
+  //     () => {
+  //       if (eventHandlers) {
+  //         Object.entries(eventHandlers).forEach(
+  //           ([eventType, eventHandlerFunction]) => {
+  //             map.on(eventType, layerID, eventHandlerFunction);
+  //           }
+  //         );
+  //       }
+  //
+  //       const layer = {
+  //         id: layerID,
+  //         type: "line",
+  //         source: sourceID,
+  //         layout: lineLayout ? { ...lineLayout } : {},
+  //         paint: linePaint ? { ...linePaint } : {},
+  //         filter: filter || ["==", "_meta-type", "basic-LineString"]
+  //       };
+  //       map.addLayer(layer);
+  //     }
+  //   );
+  // }
   /**
    * @desc Creates layers for GeoJson.Feature and passes own context to the children children
    */
@@ -322,18 +268,20 @@ class Layer extends GeoJSONDataSource<LayerProps, LayerStateI> {
     } = this.props;
     if (this.state) {
       const { sourceID } = this.state;
+      const { type, filter } = this.props;
       // create layers with styles passed to layer props => styles all features with out own style
-      this.addFillLayer(sourceID, StyleUtils.transformFillPaint(fillPaint), {});
-      this.addLineLayer(
-        sourceID,
-        StyleUtils.transformLinePaint(linePaint),
-        lineLayout
-      );
-      this.addCircleLayer(
-        sourceID,
-        StyleUtils.transformCirclePaint(circlePaint),
-        circleLayout
-      );
+
+      const layerID = `${type}-${uuid()}`;
+
+      const layer = {
+        id: layerID,
+        type: type,
+        source: sourceID,
+        paint: StyleUtils.transformFillPaint(fillPaint),
+        layout: StyleUtils.transformFillPaint(fillLayout)
+        // filter: ["==", "&type", "Polygon"]
+      };
+      map.addLayer(layer);
 
       // takes source from the extended class
       const source: GeoJSONSource = this.getSource();

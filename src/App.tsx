@@ -57,10 +57,6 @@ function MyCircle() {
       click={e => {
         console.log("my circle: ", e);
       }}
-      paint={{
-        radius: radius,
-        color: "red"
-      }}
     />
   );
 }
@@ -107,34 +103,30 @@ const App: React.FC = () => {
           }}
           fillPaint={{ color: "#088", opacity: 0.8 }}
           fillLayout={{ visibility: "visible" }}
+          // filter={[]}
+          type={"fill"}
         >
-          <MyCircle />
+          {/*<MyCircle />*/}
 
           <Polygon
-            // paint={{ color: "yellow", opacity: 1, opacityTransition: {} }}
             coordinates={testPolygon2}
             click={e => {
               console.log("click polygon: ", e, e.features);
             }}
           />
-          <Circle
-            click={e => {
-              console.log("basic: ", e.features);
-            }}
-            coordinates={[6.087253, 50.776521]}
-          />
-          <Line
-            click={e => {
-              console.log("line: ", e);
-            }}
-            coordinates={[[6.087253, 50.775521], [6.090582, 50.775345]]}
-            paint={{
-              color: "green",
-              width: 5,
-              opacity: 0.8
-            }}
-          />
-          <Line coordinates={[[6.084703, 50.772088], [6.084402, 50.774273]]} />
+          {/*<Circle*/}
+          {/*  click={e => {*/}
+          {/*    console.log("basic: ", e.features);*/}
+          {/*  }}*/}
+          {/*  coordinates={[6.087253, 50.776521]}*/}
+          {/*/>*/}
+          {/*<Line*/}
+          {/*  click={e => {*/}
+          {/*    console.log("line: ", e);*/}
+          {/*  }}*/}
+          {/*  coordinates={[[6.087253, 50.775521], [6.090582, 50.775345]]}*/}
+          {/*/>*/}
+          {/*<Line coordinates={[[6.084703, 50.772088], [6.084402, 50.774273]]} />*/}
         </Layer>
       </Map>
     </div>

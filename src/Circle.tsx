@@ -5,9 +5,7 @@ import {CircleLayout, CirclePaint, EventHandler, FeatureTypes, Lat, Lng} from ".
 
 interface CircleProps extends FeatureProps {
   coordinates: [Lng, Lat];
-  paint?: CirclePaint;
   click?: EventHandler;
-  layout?: CircleLayout;
 }
 interface CircleState {}
 

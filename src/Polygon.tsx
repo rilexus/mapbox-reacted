@@ -6,7 +6,7 @@ import { EventHandler, FeatureTypes, FillPaint } from "./Types";
 interface PolygonProps extends FeatureProps {
   coordinates: number[][][];
   click?: EventHandler;
-  paint?: FillPaint;
+  properties?: any;
 }
 interface PolygonState {}
 
