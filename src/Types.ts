@@ -140,6 +140,12 @@ export enum FeatureTypes {
 	LineString = "LineString",
 	Point = "Point"
 }
+
+export enum LayerTypes {
+	Fill='fill',
+	Circle = 'circle',
+	Line = 'line'
+}
 export interface MapContext {
 	map?: Map;
 	layer?: Layer

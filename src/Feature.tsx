@@ -1,27 +1,96 @@
 import React from "react";
 import uuid from "uuid";
 import { Evented } from "./Evented";
-import { FeatureTypes } from "./Types";
+import { EventHandler, EventType, FeatureTypes } from "./Types";
 import { StyleUtils } from "./utils";
 
 export interface FeatureProps {
-  paint?: any;
-  layout?: any;
   coordinates: any;
+  properties?: { [key: string]: any };
 }
 interface FeatureStateI {
-  _id: string;
+  __id: string;
 }
 export default class Feature<P, State> extends Evented<
   FeatureProps | any,
   FeatureStateI
 > {
   featureType: FeatureTypes;
-  mapElement: any;
 
   constructor(props: any) {
     super(props);
+    this.bindEventsToFeature = this.bindEventsToFeature.bind(this);
     this.addFeature = this.addFeature.bind(this);
+
+    this.bindEventsToFeature();
+  }
+
+  addFeature(geometry: GeoJSON.Geometry, properties: any) {
+    const {
+      mapbox: { layer, map }
+    } = this.props;
+
+    if (layer) {
+      const id = uuid();
+      // save unique id for the feature
+      this.setState(
+        (state: FeatureStateI) => ({
+          ...state,
+          __id: id
+        }),
+        () => {
+          const feature = {
+            type: "Feature",
+            geometry: {
+              ...geometry
+            },
+            properties: {
+              ...properties,
+              __id: id
+            }
+          };
+          layer.addFeature(feature);
+
+          this.forceUpdate();
+        }
+      );
+    }
+  }
+
+  bindEventsToFeature() {
+    // NOTE: EventHandlers are attached to a whole map layer not a specific feature by default.
+    // See: https://docs.mapbox.com/mapbox-gl-js/example/popup-on-click/
+    // Every feature event handler is called on a map event
+    // and need to be filtered to distinguish the fired event to a specific feature.
+    const {
+      mapbox: { layer, map }
+    } = this.props;
+
+    this.extractedEvents = Object.entries(this.extractedEvents).reduce(
+      (acc, [eventType, eventHandler]) => {
+        const eventFilter = (e: any) => {
+          const { __id } = this.state;
+
+          // if the feature __id in the fired event is same as the current feature __id
+          // the event will be passed(filtered) along, else dont.
+          if (e.features[0].properties.__id === __id) {
+            eventHandler(e);
+          }
+        };
+        return {
+          ...acc,
+          [eventType]: eventFilter
+        };
+      },
+      {}
+    );
+    if (layer) {
+      Object.entries(this.extractedEvents).forEach(
+        ([eventType, eventHandleFunction]: [EventType, EventHandler]) => {
+          map.on(eventType, layer.layer.id, eventHandleFunction);
+        }
+      );
+    }
   }
 
   componentDidUpdate(
@@ -31,17 +100,14 @@ export default class Feature<P, State> extends Evented<
   ): void {
     const {
       mapbox: { layer },
-      paint,
       coordinates,
-      layout
+      properties
     } = this.props;
     if (layer) {
-      layer.updateFeature(
-        this.state._id,
-        coordinates,
-        StyleUtils.transformPaint(this.featureType, paint),
-        layout
-      );
+      layer.updateFeature(this.state.__id, coordinates, {
+        ...properties,
+        __id: this.state.__id
+      });
     }
   }
 
@@ -49,70 +115,20 @@ export default class Feature<P, State> extends Evented<
     const {
       mapbox: { map }
     } = this.props;
-    this.mapElement = map;
-
-    // map.on("click", layerID, (e: any) => {
-    //   // console.log(e);
-    // });
-
     super.componentDidMount();
-  }
-
-  addFeature(
-    geometry: GeoJSON.Geometry,
-    properties: any,
-    paint?: any,
-    layout?: any
-  ) {
-    const {
-      mapbox: { layer }
-    } = this.props;
-
-    if (layer) {
-      const _id = uuid();
-      // save unique id for the feature
-      this.setState(
-        (state: FeatureStateI) => ({
-          ...state,
-          _id
-        }),
-        () => {
-          const hasOwnStyle = !!(paint || layout);
-          const feature = {
-            type: "Feature",
-            geometry: {
-              ...geometry
-            },
-            properties: {
-              ...properties,
-              _id,
-              "_meta-type": `${hasOwnStyle ? "custom" : "basic"}-${
-                geometry.type
-              }`
-            }
-          };
-          // transform style from camelCase to kebab-case
-          let transformedPaint = StyleUtils.transformPaint(
-            geometry.type as FeatureTypes,
-            paint
-          );
-          layer.addFeature(
-            feature,
-            { paint: transformedPaint, layout },
-            this.extractedEvents
-          );
-          this.forceUpdate();
-        }
-      );
-    }
   }
 
   componentWillUnmount(): void {
     const {
-      mapbox: { layer }
+      mapbox: { layer, map }
     } = this.props;
     if (layer) {
-      layer.removeFeature(this.state._id);
+      Object.entries(this.extractedEvents).forEach(
+        ([eventType, eventHandleFunction]: [EventType, EventHandler]) => {
+          map.off(eventType, layer.layer.id, eventHandleFunction);
+        }
+      );
+      layer.removeFeature(this.state.__id);
     }
   }
   render(): any {

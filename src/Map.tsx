@@ -32,7 +32,7 @@ export class Map extends Evented<OwnProps, any> {
     };
     const map = new MapBox.Map(options);
     this.mapElement = map;
-    this.bindEventProps(this.mapElement);
+    this.bindEvent(this.mapElement);
     // set context for child map components
     this.contextValue = {
       container: this.mapElement,

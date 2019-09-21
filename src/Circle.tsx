@@ -5,9 +5,7 @@ import {CircleLayout, CirclePaint, EventHandler, FeatureTypes, Lat, Lng} from ".
 
 interface CircleProps extends FeatureProps {
   coordinates: [Lng, Lat];
-  paint?: CirclePaint;
   click?: EventHandler;
-  layout?: CircleLayout;
 }
 interface CircleState {}
 
@@ -18,8 +16,8 @@ class Circle extends Feature<CircleProps, CircleState> {
   }
 
   componentDidMount(): void {
-    const { coordinates, paint, layout } = this.props;
-    this.addFeature({ type: this.featureType, coordinates }, {}, paint, layout);
+    const { coordinates, properties } = this.props;
+    this.addFeature({ type: this.featureType, coordinates }, properties||{});
     super.componentDidMount();
   }
 
