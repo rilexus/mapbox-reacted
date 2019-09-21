@@ -4,6 +4,7 @@ import { MapContextProvider } from "./Context";
 import { MapboxOptions } from "mapbox-gl";
 import { Lat, Lng } from "./Types";
 import { Evented } from "./Evented";
+import { MapLayer } from "./MapLayer";
 
 interface OwnProps {
   accessToken: string;
@@ -14,7 +15,7 @@ interface OwnProps {
   zoom: number;
 }
 // start at componentDiMount
-export class Map extends Evented<OwnProps, any> {
+export class Map extends MapLayer {
   contextValue: any;
   mapElementContainer: any;
   mapElement: any;
@@ -30,7 +31,7 @@ export class Map extends Evented<OwnProps, any> {
       center: center, // starting position [lng, lat]
       zoom: zoom // starting zoom
     };
-    const map = new MapBox.Map(options);
+    const map: MapBox.Map = new MapBox.Map(options);
     this.mapElement = map;
     this.bindEvent(this.mapElement);
     // set context for child map components
@@ -53,6 +54,14 @@ export class Map extends Evented<OwnProps, any> {
   componentWillUnmount(): void {
     // clean up if map un-mounts
     if (this.mapElement) this.mapElement.remove();
+  }
+  componentDidUpdate(
+    prevProps: Readonly<any>,
+    prevState: Readonly<any>,
+    snapshot?: any
+  ): void {
+    // TODO: handle map props update
+    this.mapElement.resize();
   }
 
   render(): any {

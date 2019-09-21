@@ -21,7 +21,9 @@ import {
 import {
   CircleLayout,
   CirclePaint,
+  EventHandler,
   EventsObject,
+  EventType,
   FeatureTypes,
   FillLayout,
   FillPaint,
@@ -31,7 +33,7 @@ import {
   MapContext
 } from "./Types";
 import { StyleUtils } from "./utils";
-import { Map } from "./Map";
+import { MapLayer } from "./MapLayer";
 
 interface LayerStateI {
   layerID: string;
@@ -82,7 +84,7 @@ export type FeatureStyle = {
  * Feature child component uses passed functions through context: addFeature, removeFeature etc to add itself to the layers data source
  * NOTE: currently layers for children with own style are not removed if the child unmounts. This can cause performance issues!
  */
-class Layer extends Component<LayerProps & any, any> {
+class Layer extends MapLayer {
   contextValue: any;
   constructor(props: any) {
     super(props);
@@ -185,6 +187,15 @@ class Layer extends Component<LayerProps & any, any> {
           };
           map.addLayer(layerOptions);
           const layer = map.getLayer(layerID);
+
+          console.log(this.extractedEvents);
+
+          Object.entries(this.extractedEvents).forEach(
+            ([eventType, eventHandleFunction]: [EventType, EventHandler]) => {
+              map.on(eventType, layerID, eventHandleFunction);
+            }
+          );
+
           this.contextValue = {
             ...this.props.mapbox,
             layer: {
@@ -194,6 +205,7 @@ class Layer extends Component<LayerProps & any, any> {
               removeFeature: this.removeFeature
             }
           };
+
           this.forceUpdate();
         }
       );
@@ -262,18 +274,18 @@ class Layer extends Component<LayerProps & any, any> {
       console.error(e);
     }
   }
-  render(): any {
-    const { children } = this.props;
-    if (children === null) return null;
-    if (this.contextValue) {
-      return (
-        <MapContextProvider value={this.contextValue}>
-          {children}
-        </MapContextProvider>
-      );
-    }
-    return <>{children}</>;
-  }
+  // render(): any {
+  //   const { children } = this.props;
+  //   if (children === null) return null;
+  //   if (this.contextValue) {
+  //     return (
+  //       <MapContextProvider value={this.contextValue}>
+  //         {children}
+  //       </MapContextProvider>
+  //     );
+  //   }
+  //   return <>{children}</>;
+  // }
 }
 
 // make map context available in this component

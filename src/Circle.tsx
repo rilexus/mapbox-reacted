@@ -1,7 +1,14 @@
 import React from "react";
-import {withMapContext} from "./Context";
-import Feature, {FeatureProps} from "./Feature";
-import {CircleLayout, CirclePaint, EventHandler, FeatureTypes, Lat, Lng} from "./Types";
+import { withMapContext } from "./Context";
+import Feature, { FeatureProps } from "./Feature";
+import {
+  CircleLayout,
+  CirclePaint,
+  EventHandler,
+  FeatureTypes,
+  Lat,
+  Lng
+} from "./Types";
 
 interface CircleProps extends FeatureProps {
   coordinates: [Lng, Lat];
@@ -12,13 +19,13 @@ interface CircleState {}
 class Circle extends Feature<CircleProps, CircleState> {
   constructor(props: any) {
     super(props);
-    this.featureType = FeatureTypes.Point
+    this.featureType = FeatureTypes.Point;
   }
 
   componentDidMount(): void {
-    const { coordinates, properties } = this.props;
-    this.addFeature({ type: this.featureType, coordinates }, properties||{});
     super.componentDidMount();
+    const { coordinates, properties } = this.props;
+    this.addFeature({ type: this.featureType, coordinates }, properties || {});
   }
 
   componentWillUnmount(): void {

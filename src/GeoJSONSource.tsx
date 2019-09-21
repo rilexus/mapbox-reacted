@@ -78,7 +78,7 @@ class GeoJSONSource<P, S> extends Component<P & any, S & DataSourceStateI> {
               setFeatures: this.setFeatures,
               getSource: this.getSource,
               getFeatures: this.getFeatures,
-              removeFeatures:this.removeFeatures
+              removeFeatures: this.removeFeatures
             }
           };
           this.forceUpdate();
@@ -86,15 +86,15 @@ class GeoJSONSource<P, S> extends Component<P & any, S & DataSourceStateI> {
       );
     });
   }
-  
+
   removeFeatures(__ids: string[]): void {
     const features = this.getFeatures();
     const newFeatures = features.filter(({ properties }: any) => {
-      return !__ids.includes(properties.__id) ;
+      return !__ids.includes(properties.__id);
     });
     this.setFeatures(newFeatures);
   }
-  
+
   componentWillUnmount(): void {
     const {
       mapbox: { map }

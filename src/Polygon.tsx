@@ -1,12 +1,12 @@
 import React from "react";
 import { withMapContext } from "./Context";
 import Feature, { FeatureProps } from "./Feature";
-import { EventHandler, FeatureTypes, FillPaint } from "./Types";
+import { EventHandler, FeatureTypes } from "./Types";
 
 interface PolygonProps extends FeatureProps {
   coordinates: number[][][];
   click?: EventHandler;
-  mouseover?:EventHandler;
+  mouseover?: EventHandler;
 }
 interface PolygonState {}
 
@@ -17,7 +17,7 @@ class Polygon extends Feature<PolygonProps, PolygonState> {
   }
 
   componentDidMount(): void {
-    const { coordinates, paint,properties } = this.props;
+    const { coordinates, paint, properties } = this.props;
     this.addFeature({ type: this.featureType, coordinates }, properties || {});
     super.componentDidMount();
   }
@@ -31,6 +31,7 @@ class Polygon extends Feature<PolygonProps, PolygonState> {
   componentWillUnmount(): void {
     super.componentWillUnmount();
   }
+ 
 }
 
 export default withMapContext<PolygonProps, any>(Polygon);

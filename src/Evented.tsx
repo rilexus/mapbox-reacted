@@ -9,6 +9,7 @@ export class Evented<Props, State> extends Component<any, any> {
     "contextmenu",
     "touchstart",
     "touchend",
+    "move",
     "touchcancel",
     "mouseup",
     "mousemove",

@@ -147,7 +147,10 @@ export enum LayerTypes {
 	Line = 'line'
 }
 export interface MapContext {
-	map?: Map;
-	layer?: Layer
-	container?: any
+	mapbox?:{
+		map?: Map;
+		layer?: Layer
+		container?: any;
+		feature?:any
+	}
 }

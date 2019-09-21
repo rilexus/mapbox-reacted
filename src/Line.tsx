@@ -28,6 +28,7 @@ class Line extends Feature<LineProps, LineState> {
   ): void {
     super.componentDidUpdate(prevProps, prevState, snapshot);
   }
+ 
 }
 
 export default withMapContext<LineProps, any>(Line);

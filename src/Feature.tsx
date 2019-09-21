@@ -3,6 +3,7 @@ import uuid from "uuid";
 import { Evented } from "./Evented";
 import { EventHandler, EventType, FeatureTypes } from "./Types";
 import { StyleUtils } from "./utils";
+import { MapLayer } from "./MapLayer";
 
 export interface FeatureProps {
   coordinates: any;
@@ -11,10 +12,7 @@ export interface FeatureProps {
 interface FeatureStateI {
   __id: string;
 }
-export default class Feature<P, State> extends Evented<
-  FeatureProps | any,
-  FeatureStateI
-> {
+export default class Feature<P, State> extends MapLayer {
   featureType: FeatureTypes;
 
   constructor(props: any) {
@@ -50,6 +48,18 @@ export default class Feature<P, State> extends Evented<
             }
           };
           layer.addFeature(feature);
+
+          this.contextValue = {
+            ...this.props.mapbox,
+            feature: {
+              geometry,
+              properties: {
+                ...properties,
+                __id: id
+              }
+            }
+          };
+          console.log("feature: ", this.props);
 
           this.forceUpdate();
         }
@@ -99,7 +109,7 @@ export default class Feature<P, State> extends Evented<
     snapshot?: any
   ): void {
     const {
-      mapbox: { layer },
+      mapbox: { layer, map },
       coordinates,
       properties
     } = this.props;
@@ -113,8 +123,9 @@ export default class Feature<P, State> extends Evented<
 
   componentDidMount(): void {
     const {
-      mapbox: { map }
+      mapbox: { map, layer }
     } = this.props;
+
     super.componentDidMount();
   }
 
@@ -130,8 +141,5 @@ export default class Feature<P, State> extends Evented<
       );
       layer.removeFeature(this.state.__id);
     }
-  }
-  render(): any {
-    return null;
   }
 }

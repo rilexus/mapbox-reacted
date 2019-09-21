@@ -6,6 +6,7 @@ import { Lat, LayerTypes, Lng } from "./Types";
 import Line from "./Line";
 import Circle from "./Circle";
 import GeoJSONSource from "./GeoJSONSource";
+import Popup from "./Popup";
 
 const testPolygon1 = [
   [[6.092471, 50.772224], [6.094703, 50.772088], [6.084402, 50.774273]]
@@ -55,9 +56,13 @@ function MyCircle() {
     />
   );
 }
+const PopupContent = () => {
+  return <span>Polygon</span>;
+};
 
 const App: React.FC = () => {
   const [visible, setVisible] = useState(true);
+  const [popupPos, setPopupPos] = useState<any>([]);
   const token =
     "pk.eyJ1Ijoic3RhbmlzMTk5MiIsImEiOiJjam14cXZsMW4xNjQ0M2tydWRjYTdtZnNnIn0.UKGr3I6KmigqCy8cR5ZHZw";
   const center = [6.0839, 50.7753] as [Lat, Lng];
@@ -73,7 +78,7 @@ const App: React.FC = () => {
     <div className="App">
       <Map
         mousemove={() => {
-          console.log("app map move");
+          // console.log("app map move");
         }}
         accessToken={token}
         mapContainerId={"map"}
@@ -81,40 +86,59 @@ const App: React.FC = () => {
         center={center}
         zoom={14}
         containerStyle={{
-          height: "500px",
-          width: "700px"
+          height: window.innerHeight,
+          width: window.innerWidth
         }}
       >
+        {/*<Popup latLng={[6.0839, 50.7793]}>Map</Popup>*/}
+
         <GeoJSONSource>
           <Layer
+            click={(e: any) => {
+              console.log("click: ", e.features);
+            }}
+            move={() => {
+              console.log("move");
+            }}
             layerName={"my-poly"}
             type={LayerTypes.Fill}
             fillPaint={{ color: "#088", opacity: 0.8 }}
             fillLayout={{ visibility: "visible" }}
           >
+            {popupPos.length === 2 ? (
+              <Popup
+                lngLat={popupPos}
+                open={() => {
+                  console.log("pop open");
+                }}
+                close={e => {
+                  // console.log("pop close: ", e);
+                }}
+              >
+                <PopupContent />
+              </Popup>
+            ) : null}
             <Polygon
               coordinates={testPolygon2}
               properties={{
                 name: "testpily 2"
               }}
-              mouseover={() => {
-                console.log("over");
+              mouseover={e => {
+                // console.log("over", e.lngLat);
               }}
               click={e => {
-                console.log("testpily 2: ", e);
+                setPopupPos([e.lngLat.lng, e.lngLat.lat]);
               }}
             />
-            {visible ? (
-              <Polygon
-                coordinates={testPolygon1}
-                properties={{
-                  name: "testpily 1"
-                }}
-                click={e => {
-                  console.log("testpily 1: ", e.features);
-                }}
-              />
-            ) : null}
+            <Polygon
+              coordinates={testPolygon1}
+              properties={{
+                name: "testpily 1"
+              }}
+              click={e => {
+                setPopupPos([e.lngLat.lng, e.lngLat.lat]);
+              }}
+            />
           </Layer>
 
           <Layer
