@@ -17,8 +17,8 @@ class Line extends Feature<LineProps, LineState> {
   }
 
   componentDidMount(): void {
-    const { coordinates,paint, layout } = this.props;
-    this.addFeature({ type: this.featureType, coordinates }, {},paint,layout);
+    const { coordinates,properties} = this.props;
+    this.addFeature({ type: this.featureType, coordinates },properties|| {});
     super.componentDidMount();
   }
   componentDidUpdate(

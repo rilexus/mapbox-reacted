@@ -6,7 +6,7 @@ import { EventHandler, FeatureTypes, FillPaint } from "./Types";
 interface PolygonProps extends FeatureProps {
   coordinates: number[][][];
   click?: EventHandler;
-  properties?: any;
+  mouseover?:EventHandler;
 }
 interface PolygonState {}
 
@@ -17,8 +17,8 @@ class Polygon extends Feature<PolygonProps, PolygonState> {
   }
 
   componentDidMount(): void {
-    const { coordinates, paint } = this.props;
-    this.addFeature({ type: this.featureType, coordinates }, {}, paint);
+    const { coordinates, paint,properties } = this.props;
+    this.addFeature({ type: this.featureType, coordinates }, properties || {});
     super.componentDidMount();
   }
   componentDidUpdate(

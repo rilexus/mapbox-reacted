@@ -24,16 +24,14 @@ export class Evented<Props, State> extends Component<any, any> {
   constructor(props: Props) {
     super(props);
     this.extractMapEventProps = this.extractMapEventProps.bind(this);
-    this.bindEventProps = this.bindEventProps.bind(this);
+    this.bindEvent = this.bindEvent.bind(this);
     this.extractedEvents = this.extractMapEventProps();
   }
 
-  componentDidMount(): void {
-    // this.bindEventProps(this.mapElement);
-  }
+  componentDidMount(): void {}
 
   extractMapEventProps() {
-    // takes all event functions in mapEventTypes passed to the component in props
+    // takes all event functions passed to the component in props if in mapEventTypes
     // and saves it in the extractedEvents Object
     return Object.keys(this.props).reduce((acc: any, propName) => {
       if (
@@ -46,10 +44,10 @@ export class Evented<Props, State> extends Component<any, any> {
     }, {});
   }
 
-  bindEventProps(element: any) {
+  bindEvent(toElement: any) {
     Object.entries(this.extractedEvents).forEach(
       ([eventType, eventHandleFunction]: [EventType, EventHandler]) => {
-        element.on(eventType, eventHandleFunction);
+        toElement.on(eventType, eventHandleFunction);
       }
     );
   }

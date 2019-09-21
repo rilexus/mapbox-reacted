@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import uuid from "uuid";
-import { MapContextProvider } from "./Context";
+import { MapContextProvider, withMapContext } from "./Context";
 
 interface DataSourceStateI {
   sourceID: string;
@@ -9,7 +9,7 @@ interface DataSourceStateI {
 /**
  * Adds data geoJson data source to the component which extends this class
  */
-class GeoJSONDataSource<P, S> extends Component<P & any, S & DataSourceStateI> {
+class GeoJSONSource<P, S> extends Component<P & any, S & DataSourceStateI> {
   contextValue: any;
 
   constructor(props: any) {
@@ -17,6 +17,7 @@ class GeoJSONDataSource<P, S> extends Component<P & any, S & DataSourceStateI> {
     this.getSource = this.getSource.bind(this);
     this.setFeatures = this.setFeatures.bind(this);
     this.getFeatures = this.getFeatures.bind(this);
+    this.removeFeatures = this.removeFeatures.bind(this);
   }
   /**
    * @desc Returns data source obj for this layer
@@ -40,6 +41,7 @@ class GeoJSONDataSource<P, S> extends Component<P & any, S & DataSourceStateI> {
         features: features
       });
     }
+    this.forceUpdate();
   }
 
   getFeatures(): GeoJSON.Feature[] {
@@ -54,7 +56,7 @@ class GeoJSONDataSource<P, S> extends Component<P & any, S & DataSourceStateI> {
     const sourceID = uuid();
 
     map.on("load", () => {
-      // adds a geojson data source and adds layers for circle, fill, line etc...
+      // creates a geojson data source on the map
       this.setState(
         state => ({
           ...state,
@@ -68,10 +70,31 @@ class GeoJSONDataSource<P, S> extends Component<P & any, S & DataSourceStateI> {
               features: []
             }
           });
+          const source = map.getSource(sourceID);
+          this.contextValue = {
+            ...this.props.mapbox,
+            container: {
+              source,
+              setFeatures: this.setFeatures,
+              getSource: this.getSource,
+              getFeatures: this.getFeatures,
+              removeFeatures:this.removeFeatures
+            }
+          };
+          this.forceUpdate();
         }
       );
     });
   }
+  
+  removeFeatures(__ids: string[]): void {
+    const features = this.getFeatures();
+    const newFeatures = features.filter(({ properties }: any) => {
+      return !__ids.includes(properties.__id) ;
+    });
+    this.setFeatures(newFeatures);
+  }
+  
   componentWillUnmount(): void {
     const {
       mapbox: { map }
@@ -82,7 +105,6 @@ class GeoJSONDataSource<P, S> extends Component<P & any, S & DataSourceStateI> {
   render(): any {
     const { children } = this.props;
     if (children === null) return null;
-
     if (this.contextValue) {
       return (
         <MapContextProvider value={this.contextValue}>
@@ -93,4 +115,4 @@ class GeoJSONDataSource<P, S> extends Component<P & any, S & DataSourceStateI> {
     return <>{children}</>;
   }
 }
-export default GeoJSONDataSource;
+export default withMapContext(GeoJSONSource);

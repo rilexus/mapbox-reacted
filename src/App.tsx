@@ -2,18 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Map } from "./Map";
 import Layer from "./Layer";
 import Polygon from "./Polygon";
-import { Lat, Lng } from "./Types";
+import { Lat, LayerTypes, Lng } from "./Types";
 import Line from "./Line";
 import Circle from "./Circle";
+import GeoJSONSource from "./GeoJSONSource";
 
 const testPolygon1 = [
-  [
-    [6.087253, 50.775521],
-    [6.090582, 50.775345],
-    [6.092471, 50.772224],
-    [6.084703, 50.772088],
-    [6.084402, 50.774273]
-  ]
+  [[6.092471, 50.772224], [6.094703, 50.772088], [6.084402, 50.774273]]
 ];
 
 const testPolygon2 = [
@@ -90,44 +85,68 @@ const App: React.FC = () => {
           width: "700px"
         }}
       >
-        <Layer
-          layerName={"testlayer"}
-          linePaint={{
-            color: "#ed6498",
-            width: 2,
-            opacity: 0.8
-          }}
-          circlePaint={{
-            radius: 5,
-            color: "green"
-          }}
-          fillPaint={{ color: "#088", opacity: 0.8 }}
-          fillLayout={{ visibility: "visible" }}
-          // filter={[]}
-          type={"fill"}
-        >
-          {/*<MyCircle />*/}
+        <GeoJSONSource>
+          <Layer
+            layerName={"my-poly"}
+            type={LayerTypes.Fill}
+            fillPaint={{ color: "#088", opacity: 0.8 }}
+            fillLayout={{ visibility: "visible" }}
+          >
+            <Polygon
+              coordinates={testPolygon2}
+              properties={{
+                name: "testpily 2"
+              }}
+              mouseover={() => {
+                console.log("over");
+              }}
+              click={e => {
+                console.log("testpily 2: ", e);
+              }}
+            />
+            {visible ? (
+              <Polygon
+                coordinates={testPolygon1}
+                properties={{
+                  name: "testpily 1"
+                }}
+                click={e => {
+                  console.log("testpily 1: ", e.features);
+                }}
+              />
+            ) : null}
+          </Layer>
 
-          <Polygon
-            coordinates={testPolygon2}
-            click={e => {
-              console.log("click polygon: ", e, e.features);
+          <Layer
+            layerName={"my-circles"}
+            type={LayerTypes.Circle}
+            circlePaint={{
+              radius: 5,
+              color: "green"
             }}
-          />
-          {/*<Circle*/}
-          {/*  click={e => {*/}
-          {/*    console.log("basic: ", e.features);*/}
-          {/*  }}*/}
-          {/*  coordinates={[6.087253, 50.776521]}*/}
-          {/*/>*/}
-          {/*<Line*/}
-          {/*  click={e => {*/}
-          {/*    console.log("line: ", e);*/}
-          {/*  }}*/}
-          {/*  coordinates={[[6.087253, 50.775521], [6.090582, 50.775345]]}*/}
-          {/*/>*/}
-          {/*<Line coordinates={[[6.084703, 50.772088], [6.084402, 50.774273]]} />*/}
-        </Layer>
+          >
+            <MyCircle />
+          </Layer>
+          <Layer
+            layerName={"my-line"}
+            type={LayerTypes.Line}
+            linePaint={{
+              color: "#ed6498",
+              width: 5,
+              opacity: 0.8
+            }}
+          >
+            <Line
+              click={e => {
+                console.log("line: ", e);
+              }}
+              coordinates={[[6.087253, 50.775521], [6.090582, 50.775345]]}
+            />
+            <Line
+              coordinates={[[6.084703, 50.772088], [6.084402, 50.774273]]}
+            />
+          </Layer>
+        </GeoJSONSource>
       </Map>
     </div>
   );

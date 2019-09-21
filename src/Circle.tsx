@@ -16,8 +16,8 @@ class Circle extends Feature<CircleProps, CircleState> {
   }
 
   componentDidMount(): void {
-    const { coordinates, paint, layout } = this.props;
-    this.addFeature({ type: this.featureType, coordinates }, {}, paint, layout);
+    const { coordinates, properties } = this.props;
+    this.addFeature({ type: this.featureType, coordinates }, properties||{});
     super.componentDidMount();
   }
 
