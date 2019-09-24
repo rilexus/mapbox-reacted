@@ -5,6 +5,8 @@ export class Evented<Props, State> extends Component<any, any> {
   mapEventTypes = [
     "dblclick",
     "dragend",
+    "drag",
+    "dragStart",
     "mouseenter",
     "mouseout",
     "contextmenu",
@@ -61,7 +63,7 @@ export class Evented<Props, State> extends Component<any, any> {
       }
     );
   };
-  
+
   unbindEvents = () => {
     Object.entries(this.extractedEvents).forEach(
       ([eventType, eventHandleFunction]: [EventType, EventHandler]) => {

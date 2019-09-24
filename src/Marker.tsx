@@ -1,11 +1,21 @@
-import React, { Component } from "react";
+import React from "react";
 import * as MapBox from "mapbox-gl";
 import ReactDOM from "react-dom";
 import { withMapContext } from "./Context";
 import { EventHandler, MapContext } from "./Types";
 import { Evented } from "./Evented";
 
-interface MarkerPropsI {
+interface MarkerEvents {
+  dragend?: EventHandler;
+  click?: EventHandler;
+  dragStart?: EventHandler;
+  drag?: EventHandler;
+  mouseover?: EventHandler;
+  mouseenter?: EventHandler;
+  mouseleave?: EventHandler;
+}
+
+interface MarkerPropsI extends MarkerEvents {
   options: {
     draggable: boolean;
     color?: string;
@@ -23,7 +33,6 @@ interface MarkerPropsI {
   };
 
   lngLat: [number, number];
-  dragend: EventHandler;
 }
 
 class Marker extends Evented<MarkerPropsI & MapContext, any> {
@@ -72,10 +81,16 @@ class Marker extends Evented<MarkerPropsI & MapContext, any> {
   };
 
   render(): any {
-    const { children } = this.props;
+    const { children, click, mouseover, mouseleave, mouseenter } = this.props;
     if (!children) return null;
     return (
-      <span ref={this.bindComponentContainer}>
+      <span
+        ref={this.bindComponentContainer}
+        onClick={click ? click : null}
+        onMouseOver={mouseover ? mouseover : null}
+        onMouseEnter={mouseenter ? mouseenter : null}
+        onMouseLeave={mouseleave ? mouseleave : null}
+      >
         <span ref={this.bindMarkerContainerElement}>{children}</span>
       </span>
     );
