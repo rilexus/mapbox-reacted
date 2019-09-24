@@ -7,6 +7,7 @@ import Line from "./Line";
 import Circle from "./Circle";
 import LayerGroup from "./LayerGroup";
 import Popup from "./Popup";
+import Marker from "./Marker";
 
 const testPolygon1 = [
   [
@@ -133,8 +134,14 @@ const App: React.FC = () => {
           width: window.innerWidth
         }}
       >
-        <Popup lngLat={[6.0839, 50.7793]}>Map</Popup>
-
+        {/*<Popup lngLat={[6.0839, 50.7793]}>Map</Popup>*/}
+        <Marker
+          draggable={true}
+          lngLat={[6.0839, 50.7793]}
+          dragend={e => {
+            console.log("drag: ", e);
+          }}
+        />
         <LayerGroup>
           <Layer
             click={(e: any) => {}}

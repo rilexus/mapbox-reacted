@@ -4,6 +4,7 @@ import { EventHandler, EventsObject, EventType } from "./Types";
 export class Evented<Props, State> extends Component<any, any> {
   mapEventTypes = [
     "dblclick",
+    "dragend",
     "mouseenter",
     "mouseout",
     "contextmenu",
@@ -25,7 +26,7 @@ export class Evented<Props, State> extends Component<any, any> {
   constructor(props: Props) {
     super(props);
     this.extractMapEventProps = this.extractMapEventProps.bind(this);
-    this.bindEvent = this.bindEvent.bind(this);
+    this.bindEventTo = this.bindEventTo.bind(this);
     this.extractedEvents = this.extractMapEventProps();
   }
 
@@ -51,10 +52,28 @@ export class Evented<Props, State> extends Component<any, any> {
     }, {});
   }
 
-  bindEvent(toElement: any) {
+  componentWillUnmount(): void {}
+
+  bindEvents = () => {
     Object.entries(this.extractedEvents).forEach(
       ([eventType, eventHandleFunction]: [EventType, EventHandler]) => {
-        toElement.on(eventType, eventHandleFunction);
+        this.mapElement.on(eventType, eventHandleFunction);
+      }
+    );
+  };
+  
+  unbindEvents = () => {
+    Object.entries(this.extractedEvents).forEach(
+      ([eventType, eventHandleFunction]: [EventType, EventHandler]) => {
+        this.mapElement.off(eventType, eventHandleFunction);
+      }
+    );
+  };
+
+  bindEventTo(element: any) {
+    Object.entries(this.extractedEvents).forEach(
+      ([eventType, eventHandleFunction]: [EventType, EventHandler]) => {
+        element.on(eventType, eventHandleFunction);
       }
     );
   }

@@ -32,7 +32,7 @@ export class Map extends MapLayer {
     };
     const map: MapBox.Map = new MapBox.Map(options);
     this.mapElement = map;
-    this.bindEvent(this.mapElement);
+    this.bindEvents();
     // set context for child map components
     this.contextValue = {
       container: this.mapElement,
