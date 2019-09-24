@@ -65,7 +65,17 @@ function MyCircle() {
   );
 }
 const PopupContent = () => {
-  return <span>Polygon</span>;
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    // popup content update test
+    const id = setInterval(() => {
+      setCount(count + 1);
+    }, 1000);
+    return () => {
+      clearInterval(id);
+    };
+  }, [count]);
+  return <span>Polygon_{count}</span>;
 };
 
 const App: React.FC = () => {
