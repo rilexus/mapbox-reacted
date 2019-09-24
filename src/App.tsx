@@ -75,7 +75,16 @@ const PopupContent = () => {
       clearInterval(id);
     };
   }, [count]);
-  return <span>Polygon_{count}</span>;
+  return (
+    <div
+      style={{
+        width: "300px",
+        height: "300px"
+      }}
+    >
+      Polygon_{count}
+    </div>
+  );
 };
 
 const App: React.FC = () => {

@@ -31,7 +31,10 @@ class Popup extends Component<PopupPropsI & MapContext, any> {
     };
 
     const popupOptions = { closeButton: false, closeOnClick: false };
-    this.popup = new MapBox.Popup(popupOptions).setLngLat(lngLat).addTo(map);
+    this.popup = new MapBox.Popup(popupOptions)
+      .setLngLat(lngLat)
+      .setMaxWidth("auto")
+      .addTo(map);
     if (this.props.close) {
       this.popup.on("close", this.props.close);
     }
@@ -79,7 +82,7 @@ class Popup extends Component<PopupPropsI & MapContext, any> {
   render() {
     const { children } = this.props;
     return (
-      <div ref={this.container}>
+      <div ref={this.container} id={"container "}>
         <div id={this.state.popupID} ref={this.bindPopupToContainer}>
           {children}
         </div>
