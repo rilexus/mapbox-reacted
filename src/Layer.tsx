@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { MapContextProvider, withMapContext } from "./Context";
-import GeoJSONSource from "./GeoJSONSource";
+import GeoJSONSource from "./LayerGroup";
 
 import uuid from "uuid";
 import {

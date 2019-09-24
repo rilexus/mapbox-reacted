@@ -9,7 +9,7 @@ interface DataSourceStateI {
 /**
  * Adds data geoJson data source to the component which extends this class
  */
-class GeoJSONSource<P, S> extends Component<P & any, S & DataSourceStateI> {
+class LayerGroup<P, S> extends Component<P & any, S & DataSourceStateI> {
   contextValue: any;
 
   constructor(props: any) {
@@ -118,4 +118,4 @@ class GeoJSONSource<P, S> extends Component<P & any, S & DataSourceStateI> {
     return <>{children}</>;
   }
 }
-export default withMapContext(GeoJSONSource);
+export default withMapContext(LayerGroup);

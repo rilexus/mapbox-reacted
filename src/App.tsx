@@ -5,7 +5,7 @@ import Polygon from "./Polygon";
 import { Lat, LayerTypes, Lng } from "./Types";
 import Line from "./Line";
 import Circle from "./Circle";
-import GeoJSONSource from "./GeoJSONSource";
+import LayerGroup from "./LayerGroup";
 import Popup from "./Popup";
 
 const testPolygon1 = [
@@ -135,7 +135,7 @@ const App: React.FC = () => {
       >
         <Popup lngLat={[6.0839, 50.7793]}>Map</Popup>
 
-        <GeoJSONSource>
+        <LayerGroup>
           <Layer
             click={(e: any) => {}}
             move={() => {}}
@@ -211,7 +211,7 @@ const App: React.FC = () => {
               coordinates={[[6.084703, 50.772088], [6.084402, 50.774273]]}
             />
           </Layer>
-        </GeoJSONSource>
+        </LayerGroup>
       </Map>
     </div>
   );
