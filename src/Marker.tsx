@@ -5,13 +5,29 @@ import { EventHandler, MapContext } from "./Types";
 import { Evented } from "./Evented";
 
 interface MarkerPropsI {
-  draggable: boolean;
+  options: {
+    draggable: boolean;
+    color?: string;
+    anchor?:
+      | "center"
+      | "top"
+      | "bottom"
+      | "left"
+      | "right"
+      | "top-left"
+      | "top-right"
+      | "bottom-left"
+      | "bottom-right";
+    offset?: [number, number];
+  };
+
   lngLat: [number, number];
   dragend: EventHandler;
 }
 
 class Marker extends Evented<MarkerPropsI & MapContext, any> {
   marker: MapBox.Marker;
+  markerContainer: any = null;
 
   constructor(props: any) {
     super(props);
@@ -19,14 +35,16 @@ class Marker extends Evented<MarkerPropsI & MapContext, any> {
 
   componentDidMount(): void {
     const {
-      draggable,
+      options,
       mapbox: { map },
-      lngLat
+      lngLat,
+      children
     } = this.props;
-    const markerOptions = {
-      draggable
-    };
-    const marker = new MapBox.Marker(markerOptions);
+
+    const marker = new MapBox.Marker({
+      ...options,
+      element: this.markerContainer
+    });
     this.marker = marker;
     this.mapElement = marker;
 
@@ -42,8 +60,14 @@ class Marker extends Evented<MarkerPropsI & MapContext, any> {
     super.componentWillUnmount();
   }
 
-  render(): null {
-    return null;
+  bindMarkerContainerElement = (el: any) => {
+    this.markerContainer = el;
+  };
+
+  render(): any {
+    const { children } = this.props;
+    if (!children) return null;
+    return <span ref={this.bindMarkerContainerElement}>{children}</span>;
   }
 }
 
