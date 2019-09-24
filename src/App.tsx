@@ -134,14 +134,12 @@ const App: React.FC = () => {
           width: window.innerWidth
         }}
       >
-        {/*<Popup lngLat={[6.0839, 50.7793]}>Map</Popup>*/}
         <Marker
           mouseover={() => {
             console.log("ever");
           }}
           options={{
-            draggable: true,
-            color: "red"
+            draggable: true
           }}
           lngLat={[6.0839, 50.7793]}
           dragend={e => {
@@ -155,10 +153,12 @@ const App: React.FC = () => {
               width: "15px",
               height: "15px",
               backgroundColor: "red",
-              borderRadius: "50%"
+              borderRadius: "50%",
+              boxShadow: "0 1px 2px rgba(0, 0, 0, 0.1)"
             }}
           />
         </Marker>
+        <Popup lngLat={[6.0839, 50.7793]}>Map</Popup>
         <LayerGroup>
           <Layer
             click={(e: any) => {}}
