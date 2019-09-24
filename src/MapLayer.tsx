@@ -9,12 +9,13 @@ export class MapLayer extends Evented<any, any> {
     super(props);
   }
 
-  componentDidMount(): void {}
+  componentDidMount(): void {
+    super.componentDidMount();
+  }
 
   render(): any {
     const { children } = this.props;
     if (children === null) return null;
-    // console.log("map layer: ", this.contextValue);
 
     if (this.contextValue)
       return (

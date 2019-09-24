@@ -59,8 +59,6 @@ export default class Feature<P, State> extends MapLayer {
               }
             }
           };
-          console.log("feature: ", this.props);
-
           this.forceUpdate();
         }
       );

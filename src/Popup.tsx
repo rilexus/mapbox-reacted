@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import ReactDOM from "react-dom";
 import * as MapBox from "mapbox-gl";
 import { withMapContext } from "./Context";
 import { EventHandler, MapContext } from "./Types";
@@ -15,6 +16,7 @@ class Popup extends Component<PopupPropsI & MapContext, any> {
   popup: MapBox.Popup;
   lngLatBounds: MapBox.LngLatBounds;
   popupContainer: any;
+  containerEl: any;
   static displayName = "Popup";
 
   constructor(props: any) {
@@ -43,6 +45,7 @@ class Popup extends Component<PopupPropsI & MapContext, any> {
   };
 
   componentDidMount(): void {
+    console.log("pop mount");
     if (this.popupContainer) {
       this.popup.setDOMContent(this.popupContainer);
     }
@@ -65,15 +68,21 @@ class Popup extends Component<PopupPropsI & MapContext, any> {
       }
       console.log("pop unmount");
 
+      ReactDOM.unmountComponentAtNode(this.containerEl);
       this.popup.remove();
     }
   }
+  container = (el: any) => {
+    this.containerEl = el;
+  };
 
   render() {
     const { children } = this.props;
     return (
-      <div id={this.state.popupID} ref={this.bindPopupToContainer}>
-        {children}
+      <div ref={this.container}>
+        <div id={this.state.popupID} ref={this.bindPopupToContainer}>
+          {children}
+        </div>
       </div>
     );
   }

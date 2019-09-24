@@ -1,9 +1,8 @@
-import React, { Component, CSSProperties } from "react";
+import React, { CSSProperties } from "react";
 import * as MapBox from "mapbox-gl";
 import { MapContextProvider } from "./Context";
 import { MapboxOptions } from "mapbox-gl";
 import { Lat, Lng } from "./Types";
-import { Evented } from "./Evented";
 import { MapLayer } from "./MapLayer";
 
 interface OwnProps {
@@ -60,8 +59,10 @@ export class Map extends MapLayer {
     prevState: Readonly<any>,
     snapshot?: any
   ): void {
+    this.extractedEvents = this.extractMapEventProps();
     // TODO: handle map props update
     this.mapElement.resize();
+    super.componentDidUpdate(prevProps, prevState, snapshot);
   }
 
   render(): any {

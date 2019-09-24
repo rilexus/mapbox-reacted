@@ -9,15 +9,23 @@ import GeoJSONSource from "./GeoJSONSource";
 import Popup from "./Popup";
 
 const testPolygon1 = [
-  [[6.092471, 50.772224], [6.094703, 50.772088], [6.084402, 50.774273]]
+  [
+    [6.0825666, 50.7763105],
+    [6.0820517, 50.7755608],
+    [6.0836127, 50.775381],
+    [6.0835805, 50.7760391],
+    [6.0831675, 50.776531],
+    [6.0825666, 50.7763105]
+  ]
 ];
 
 const testPolygon2 = [
   [
-    [6.087253, 50.775521],
-    [6.090582, 50.775345],
-    [6.084703, 50.772088],
-    [6.084402, 50.774273]
+    [6.0841331, 50.7764869],
+    [6.0852489, 50.7762799],
+    [6.084809, 50.7755438],
+    [6.0837415, 50.77571],
+    [6.0841331, 50.7764869]
   ]
 ];
 
@@ -62,7 +70,10 @@ const PopupContent = () => {
 
 const App: React.FC = () => {
   const [visible, setVisible] = useState(true);
-  const [popupPos, setPopupPos] = useState<any>([]);
+  const [popup, setPopupData] = useState({
+    visible: false,
+    coordinates: [6.0839, 50.7753] as [number, number]
+  });
   const token =
     "pk.eyJ1Ijoic3RhbmlzMTk5MiIsImEiOiJjam14cXZsMW4xNjQ0M2tydWRjYTdtZnNnIn0.UKGr3I6KmigqCy8cR5ZHZw";
   const center = [6.0839, 50.7753] as [Lat, Lng];
@@ -74,12 +85,25 @@ const App: React.FC = () => {
     }, 2000);
   }, []);
 
+  const showPopup = (at: [number, number]) => {
+    setPopupData({
+      visible: true,
+      coordinates: at
+    });
+  };
+  const hidePopup = () => {
+    setPopupData({
+      ...popup,
+      visible: false
+    });
+  };
+
   return (
     <div className="App">
       <Map
-        mousemove={() => {
-          // console.log("app map move");
-        }}
+        mousemove={() => {}}
+        move={() => {}}
+        click={hidePopup}
         accessToken={token}
         mapContainerId={"map"}
         style={style}
@@ -90,24 +114,20 @@ const App: React.FC = () => {
           width: window.innerWidth
         }}
       >
-        {/*<Popup latLng={[6.0839, 50.7793]}>Map</Popup>*/}
+        <Popup lngLat={[6.0839, 50.7793]}>Map</Popup>
 
         <GeoJSONSource>
           <Layer
-            click={(e: any) => {
-              console.log("click: ", e.features);
-            }}
-            move={() => {
-              console.log("move");
-            }}
+            click={(e: any) => {}}
+            move={() => {}}
             layerName={"my-poly"}
             type={LayerTypes.Fill}
             fillPaint={{ color: "#088", opacity: 0.8 }}
             fillLayout={{ visibility: "visible" }}
           >
-            {popupPos.length === 2 ? (
+            {popup.visible ? (
               <Popup
-                lngLat={popupPos}
+                lngLat={popup.coordinates}
                 open={() => {
                   console.log("pop open");
                 }}
@@ -127,7 +147,8 @@ const App: React.FC = () => {
                 // console.log("over", e.lngLat);
               }}
               click={e => {
-                setPopupPos([e.lngLat.lng, e.lngLat.lat]);
+                console.log("poly 2");
+                showPopup([e.lngLat.lng, e.lngLat.lat]);
               }}
             />
             <Polygon
@@ -136,7 +157,8 @@ const App: React.FC = () => {
                 name: "testpily 1"
               }}
               click={e => {
-                setPopupPos([e.lngLat.lng, e.lngLat.lat]);
+                console.log("poly 1");
+                showPopup([e.lngLat.lng, e.lngLat.lat]);
               }}
             />
           </Layer>

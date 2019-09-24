@@ -99,7 +99,10 @@ class GeoJSONSource<P, S> extends Component<P & any, S & DataSourceStateI> {
     const {
       mapbox: { map }
     } = this.props;
-    map.removeSource(this.state.sourceID);
+    if (map) {
+      console.log("source: ", map);
+      map.removeSource(this.state.sourceID);
+    }
   }
 
   render(): any {
