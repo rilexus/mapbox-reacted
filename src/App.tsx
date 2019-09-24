@@ -135,26 +135,29 @@ const App: React.FC = () => {
         }}
       >
         {/*<Popup lngLat={[6.0839, 50.7793]}>Map</Popup>*/}
-        <Marker
-          options={{
-            draggable: true,
-            color: "red"
-          }}
-          lngLat={[6.0839, 50.7793]}
-          dragend={e => {
-            console.log("drag: ", e);
-          }}
-        >
-          <div
-            style={{
-              display: "block",
-              position: "relative",
-              width: "50px",
-              height: "50px",
-              backgroundColor: "red"
+        {visible ? (
+          <Marker
+            options={{
+              draggable: true,
+              color: "red"
             }}
-          />
-        </Marker>
+            lngLat={[6.0839, 50.7793]}
+            dragend={e => {
+              console.log("drag: ", e);
+            }}
+          >
+            <div
+              style={{
+                display: "block",
+                position: "relative",
+                width: "15px",
+                height: "15px",
+                backgroundColor: "red",
+                borderRadius: "50%"
+              }}
+            />
+          </Marker>
+        ) : null}
         <LayerGroup>
           <Layer
             click={(e: any) => {}}

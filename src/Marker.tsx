@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import * as MapBox from "mapbox-gl";
+import ReactDOM from "react-dom";
 import { withMapContext } from "./Context";
 import { EventHandler, MapContext } from "./Types";
 import { Evented } from "./Evented";
@@ -28,6 +29,7 @@ interface MarkerPropsI {
 class Marker extends Evented<MarkerPropsI & MapContext, any> {
   marker: MapBox.Marker;
   markerContainer: any = null;
+  componentContainer: any;
 
   constructor(props: any) {
     super(props);
@@ -57,6 +59,7 @@ class Marker extends Evented<MarkerPropsI & MapContext, any> {
   componentWillUnmount(): void {
     this.unbindEvents();
     this.marker.remove();
+    ReactDOM.unmountComponentAtNode(this.componentContainer);
     super.componentWillUnmount();
   }
 
@@ -64,10 +67,18 @@ class Marker extends Evented<MarkerPropsI & MapContext, any> {
     this.markerContainer = el;
   };
 
+  bindComponentContainer = (el: any) => {
+    this.componentContainer = el;
+  };
+
   render(): any {
     const { children } = this.props;
     if (!children) return null;
-    return <span ref={this.bindMarkerContainerElement}>{children}</span>;
+    return (
+      <span ref={this.bindComponentContainer}>
+        <span ref={this.bindMarkerContainerElement}>{children}</span>
+      </span>
+    );
   }
 }
 
