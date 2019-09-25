@@ -222,8 +222,8 @@ const App: React.FC = () => {
             layerName={"lines"}
             type={LayerTypes.Line}
             linePaint={{
-              "line-color": "#004f4f",
-              "line-width": 5
+              "line-color": "red",
+              "line-width": 2
             }}
             filter={["==", "$type", "Polygon"]}
           />

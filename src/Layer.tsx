@@ -114,19 +114,15 @@ class Layer extends MapLayer<LayerProps> {
           let _filter: string[] = [""];
 
           if (type === LayerTypes.Fill) {
-            // paint = StyleUtils.transformFillPaint(fillPaint);
-            // layout = StyleUtils.transformFillPaint(fillLayout);
             paint = fillPaint;
             layout = fillLayout;
             _filter = ["==", "$type", "Polygon"];
           }
           if (type === LayerTypes.Circle) {
-            // paint = StyleUtils.transformCirclePaint(circlePaint);
             paint = circlePaint;
             _filter = ["==", "$type", "Point"];
           }
           if (type === LayerTypes.Line) {
-            // paint = StyleUtils.transformLinePaint(linePaint);
             paint = linePaint;
             _filter = ["==", "$type", "LineString"];
           }
@@ -141,14 +137,6 @@ class Layer extends MapLayer<LayerProps> {
           };
           map.addLayer(layerOptions);
           const layer = map.getLayer(layerID);
-
-          console.log(this.extractedEventHandlers);
-
-          Object.entries(this.extractedEventHandlers).forEach(
-            ([eventType, eventHandleFunction]: [EventType, EventHandler]) => {
-              map.on(eventType, layerID, eventHandleFunction);
-            }
-          );
 
           this.contextValue = {
             ...this.props.mapbox,
