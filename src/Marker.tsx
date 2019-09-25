@@ -62,11 +62,21 @@ class Marker extends Evented<MarkerPropsI & MapContext, any> {
     if (map) {
       this.marker.setLngLat(lngLat).addTo(map);
     }
-    this.bindEvents();
+    this.bindEvents(this.extractedEvents, {});
+  }
+
+  componentDidUpdate(prevProps: any, prevState: any, snapshot?: any): void {
+    const { lngLat: nextLngLat } = this.props;
+    const { lngLat: prevLngLat } = prevProps;
+
+    if (nextLngLat !== prevProps) {
+      this.marker.setLngLat(nextLngLat);
+    }
+
+    super.componentDidUpdate(prevProps, prevState, snapshot);
   }
 
   componentWillUnmount(): void {
-    this.unbindEvents();
     this.marker.remove();
     ReactDOM.unmountComponentAtNode(this.componentContainer);
     super.componentWillUnmount();

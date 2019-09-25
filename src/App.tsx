@@ -47,7 +47,7 @@ function MyCircle() {
   }
 
   useEffect(() => {
-    if (count > 2) {
+    if (count > 5) {
       return;
     }
     const id = setInterval(update, 500);
@@ -57,12 +57,14 @@ function MyCircle() {
   }, [coords, radius]);
 
   return (
-    <Circle
-      coordinates={coords}
-      click={e => {
-        console.log("my circle: ", e);
-      }}
-    />
+    <>
+      <Circle
+        coordinates={coords}
+        click={e => {
+          console.log("my circle: ", e);
+        }}
+      />
+    </>
   );
 }
 const PopupContent = () => {
@@ -85,6 +87,81 @@ const PopupContent = () => {
     >
       Polygon_{count}
     </div>
+  );
+};
+
+const MovableLine = () => {
+  const [lineCoords, setLineCoords] = useState([
+    [6.087253, 50.775521],
+    [6.090582, 50.775345]
+  ]);
+  return (
+    <Layer
+      layerName={"my-line"}
+      type={LayerTypes.Line}
+      linePaint={{
+        color: "#ed6498",
+        width: 5,
+        opacity: 0.8
+      }}
+    >
+      <Marker
+        mouseover={() => {
+          console.log("ever");
+        }}
+        options={{
+          draggable: true
+        }}
+        lngLat={lineCoords[0] as [number, number]}
+        dragend={e => {
+          const eventCoords = e.target.getLngLat();
+          const lngLat = [eventCoords.lng, eventCoords.lat];
+          const newCoords = [lngLat, lineCoords[1]];
+          setLineCoords(newCoords);
+        }}
+      >
+        <div
+          style={{
+            display: "block",
+            position: "relative",
+            width: "15px",
+            height: "15px",
+            backgroundColor: "red",
+            borderRadius: "50%",
+            boxShadow: "0 1px 2px rgba(0, 0, 0, 0.1)"
+          }}
+        />
+      </Marker>
+      <Marker
+        mouseover={() => {
+          console.log("ever");
+        }}
+        options={{
+          draggable: true
+        }}
+        lngLat={lineCoords[1] as [number, number]}
+        dragend={e => {
+          const eventCoords = e.target.getLngLat();
+          const lngLat = [eventCoords.lng, eventCoords.lat];
+          const newCoords = [lineCoords[0], lngLat];
+          setLineCoords(newCoords);
+        }}
+      >
+        <div
+          style={{
+            display: "block",
+            position: "relative",
+            width: "15px",
+            height: "15px",
+            backgroundColor: "red",
+            borderRadius: "50%",
+            boxShadow: "0 1px 2px rgba(0, 0, 0, 0.1)"
+          }}
+        />
+      </Marker>
+
+      <Line coordinates={lineCoords} />
+    </Layer>
   );
 };
 
@@ -134,30 +211,6 @@ const App: React.FC = () => {
           width: window.innerWidth
         }}
       >
-        <Marker
-          mouseover={() => {
-            console.log("ever");
-          }}
-          options={{
-            draggable: true
-          }}
-          lngLat={[6.0839, 50.7793]}
-          dragend={e => {
-            console.log("drag: ", e);
-          }}
-        >
-          <div
-            style={{
-              display: "block",
-              position: "relative",
-              width: "15px",
-              height: "15px",
-              backgroundColor: "red",
-              borderRadius: "50%",
-              boxShadow: "0 1px 2px rgba(0, 0, 0, 0.1)"
-            }}
-          />
-        </Marker>
         <Popup lngLat={[6.0839, 50.7793]}>Map</Popup>
         <LayerGroup>
           <Layer
@@ -205,6 +258,7 @@ const App: React.FC = () => {
               }}
             />
           </Layer>
+          <MovableLine />
 
           <Layer
             layerName={"my-circles"}
@@ -215,25 +269,6 @@ const App: React.FC = () => {
             }}
           >
             <MyCircle />
-          </Layer>
-          <Layer
-            layerName={"my-line"}
-            type={LayerTypes.Line}
-            linePaint={{
-              color: "#ed6498",
-              width: 5,
-              opacity: 0.8
-            }}
-          >
-            <Line
-              click={e => {
-                console.log("line: ", e);
-              }}
-              coordinates={[[6.087253, 50.775521], [6.090582, 50.775345]]}
-            />
-            <Line
-              coordinates={[[6.084703, 50.772088], [6.084402, 50.774273]]}
-            />
           </Layer>
         </LayerGroup>
       </Map>

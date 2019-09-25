@@ -27,55 +27,109 @@ export class Evented<Props, State> extends Component<any, any> {
 
   constructor(props: Props) {
     super(props);
-    this.extractMapEventProps = this.extractMapEventProps.bind(this);
-    this.bindEventTo = this.bindEventTo.bind(this);
-    this.extractedEvents = this.extractMapEventProps();
+    this.extractEventHandlers = this.extractEventHandlers.bind(this);
+    this.bindEvents = this.bindEvents.bind(this);
+    this.unbindEvents = this.unbindEvents.bind(this);
+
+    this.extractedEvents = this.extractEventHandlers(this.props);
   }
 
-  componentDidMount(): void {}
+  componentDidMount(): void {
+    this.bindEvents(this.extractedEvents);
+  }
 
   componentDidUpdate(
     prevProps: Readonly<any>,
     prevState: Readonly<any>,
     snapshot?: any
-  ): void {}
+  ): void {
+    // binds/re-binds event handlers passed to component
+    this.extractedEvents = this.bindEvents(
+      this.extractEventHandlers(this.props),
+      this.extractedEvents
+    );
+  }
 
-  extractMapEventProps() {
+  /**
+   * Extracts event handlers from given object
+   * @param {Object} fromProps
+   */
+  extractEventHandlers(fromProps: any) {
     // takes all event functions passed to the component in props if in mapEventTypes
     // and saves it in the extractedEvents Object
-    return Object.keys(this.props).reduce((acc: any, propName) => {
+    return Object.keys(fromProps).reduce((acc: any, propName) => {
       if (
-        this.props[propName] !== null &&
+        fromProps[propName] !== null &&
         this.mapEventTypes.includes(propName)
       ) {
-        acc[propName] = this.props[propName];
+        acc[propName] = fromProps[propName];
       }
       return acc;
     }, {});
   }
 
-  componentWillUnmount(): void {}
+  componentWillUnmount(): void {
+    this.unbindEvents();
+  }
 
-  bindEvents = () => {
-    Object.entries(this.extractedEvents).forEach(
-      ([eventType, eventHandleFunction]: [EventType, EventHandler]) => {
-        this.mapElement.on(eventType, eventHandleFunction);
+  /**
+   * binds and rebinds passed event handler functions to the component
+   * @param {EventsObject} next
+   * @param {EventsObject} prev
+   * @param eventEmitter
+   */
+  bindEvents(
+    next: EventsObject,
+    prev: EventsObject = {},
+    eventEmitter = this.mapElement
+  ): EventsObject {
+    // if no element to bind to or element does not support/emit events
+    if (!eventEmitter || !eventEmitter.on) return {};
+
+    // collect new event handlers in this Obj
+    const newEventObject: EventsObject = {};
+
+    // remove prev event handlers from event emitter element
+    Object.entries(prev).forEach(
+      ([
+        eventType /* event name: click, move, etc ... */,
+        eventHandler /* function to handle event, passed to component*/
+      ]) => {
+        if (prev[eventType] !== next[eventType] || !next[eventType]) {
+          // if next event handler changed or was does not exist in next eventObject
+          // it will be removed from eventEmitter
+          eventEmitter.off(eventType, eventHandler);
+        }
+        // keep unchanged event handlers
+        if (prev[eventType] === next[eventType])
+          newEventObject[eventType] = eventHandler;
       }
     );
-  };
 
-  unbindEvents = () => {
-    Object.entries(this.extractedEvents).forEach(
-      ([eventType, eventHandleFunction]: [EventType, EventHandler]) => {
-        this.mapElement.off(eventType, eventHandleFunction);
+    // add next event handlers to eventEmitter
+    Object.entries(next).forEach(([eventType, eventHandler]) => {
+      if (next[eventType] !== prev[eventType] || !prev[eventType]) {
+        newEventObject[eventType] = eventHandler;
+        eventEmitter.on(eventType, eventHandler);
       }
-    );
-  };
+    });
+    return newEventObject;
+  }
 
-  bindEventTo(element: any) {
-    Object.entries(this.extractedEvents).forEach(
+  /**
+   * Unbinds event handlers from given element.
+   * @param eventsObject
+   * @param element
+   */
+  unbindEvents(
+    eventsObject: EventsObject = this.extractedEvents,
+    element = this.mapElement
+  ): void {
+    if (!element) return;
+
+    Object.entries(eventsObject).forEach(
       ([eventType, eventHandleFunction]: [EventType, EventHandler]) => {
-        element.on(eventType, eventHandleFunction);
+        element.off(eventType, eventHandleFunction);
       }
     );
   }

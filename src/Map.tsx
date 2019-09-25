@@ -32,7 +32,7 @@ export class Map extends MapLayer {
     };
     const map: MapBox.Map = new MapBox.Map(options);
     this.mapElement = map;
-    this.bindEvents();
+    // this.bindEvents(this.extractedEvents, {});
     // set context for child map components
     this.contextValue = {
       container: this.mapElement,
@@ -59,7 +59,7 @@ export class Map extends MapLayer {
     prevState: Readonly<any>,
     snapshot?: any
   ): void {
-    this.extractedEvents = this.extractMapEventProps();
+    this.extractedEvents = this.extractEventHandlers(this.props);
     // TODO: handle map props update
     this.mapElement.resize();
     super.componentDidUpdate(prevProps, prevState, snapshot);
