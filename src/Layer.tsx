@@ -188,9 +188,9 @@ class Layer extends MapLayer {
           map.addLayer(layerOptions);
           const layer = map.getLayer(layerID);
 
-          console.log(this.extractedEvents);
+          console.log(this.extractedEventHandlers);
 
-          Object.entries(this.extractedEvents).forEach(
+          Object.entries(this.extractedEventHandlers).forEach(
             ([eventType, eventHandleFunction]: [EventType, EventHandler]) => {
               map.on(eventType, layerID, eventHandleFunction);
             }

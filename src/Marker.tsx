@@ -57,12 +57,15 @@ class Marker extends Evented<MarkerPropsI & MapContext, any> {
       element: this.markerContainer
     });
     this.marker = marker;
+    // set mapElement to marker => event handle functions passed to this component
+    // will be attached to the marker instance by the Evented class
     this.mapElement = marker;
 
     if (map) {
       this.marker.setLngLat(lngLat).addTo(map);
     }
-    this.bindEvents(this.extractedEvents, {});
+
+    super.componentDidMount();
   }
 
   componentDidUpdate(prevProps: any, prevState: any, snapshot?: any): void {

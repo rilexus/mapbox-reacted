@@ -74,7 +74,7 @@ export default class Feature<P, State> extends MapLayer {
       mapbox: { layer, map }
     } = this.props;
 
-    this.extractedEvents = Object.entries(this.extractedEvents).reduce(
+    this.extractedEventHandlers = Object.entries(this.extractedEventHandlers).reduce(
       (acc, [eventType, eventHandler]) => {
         const eventFilter = (e: any) => {
           const { __id } = this.state;
@@ -93,7 +93,7 @@ export default class Feature<P, State> extends MapLayer {
       {}
     );
     if (layer) {
-      Object.entries(this.extractedEvents).forEach(
+      Object.entries(this.extractedEventHandlers).forEach(
         ([eventType, eventHandleFunction]: [EventType, EventHandler]) => {
           map.on(eventType, layer.layer.id, eventHandleFunction);
         }
@@ -132,7 +132,7 @@ export default class Feature<P, State> extends MapLayer {
       mapbox: { layer, map }
     } = this.props;
     if (layer) {
-      Object.entries(this.extractedEvents).forEach(
+      Object.entries(this.extractedEventHandlers).forEach(
         ([eventType, eventHandleFunction]: [EventType, EventHandler]) => {
           map.off(eventType, layer.layer.id, eventHandleFunction);
         }

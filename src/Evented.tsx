@@ -1,8 +1,20 @@
 import React, { Component } from "react";
 import { EventHandler, EventsObject, EventType } from "./Types";
 
+/**
+ * NOTE: "event handler" refers to a function passed to a component which will be called
+ * on a event emitted by a element. In most cases its the Mapbox instance.
+ * <Component click={()=>{this is a event handle function}}/>
+ *
+ * This class handles event handlers passed to a component.
+ * 1. Extracts event handlers from props
+ * 2. binds extracted event handlers to a event emitter, usually the Mapbox instance on component mount
+ * 3. re-binds extracted event handlers to a event emitter, usually the Mapbox instance on component update
+ * 3. unbinds event handlers on component unmount
+ * 4. allows firing events supported by event emitter
+ */
 export class Evented<Props, State> extends Component<any, any> {
-  mapEventTypes = [
+  recognizedEventTypes = [
     "dblclick",
     "dragend",
     "drag",
@@ -22,20 +34,23 @@ export class Evented<Props, State> extends Component<any, any> {
     "mouseover"
   ];
   mapElement: any;
-  // contains all event functions (click, mouseleave, mouseover, ... ) passed to component which extends this class
-  extractedEvents: EventsObject;
+  /**
+   * Holds event handle functions passed to component
+   */
+  extractedEventHandlers: EventsObject;
 
   constructor(props: Props) {
     super(props);
     this.extractEventHandlers = this.extractEventHandlers.bind(this);
     this.bindEvents = this.bindEvents.bind(this);
     this.unbindEvents = this.unbindEvents.bind(this);
+    this.fireEvent = this.fireEvent.bind(this);
 
-    this.extractedEvents = this.extractEventHandlers(this.props);
+    this.extractedEventHandlers = this.extractEventHandlers(this.props);
   }
 
   componentDidMount(): void {
-    this.bindEvents(this.extractedEvents);
+    this.bindEvents(this.extractedEventHandlers);
   }
 
   componentDidUpdate(
@@ -44,9 +59,9 @@ export class Evented<Props, State> extends Component<any, any> {
     snapshot?: any
   ): void {
     // binds/re-binds event handlers passed to component
-    this.extractedEvents = this.bindEvents(
+    this.extractedEventHandlers = this.bindEvents(
       this.extractEventHandlers(this.props),
-      this.extractedEvents
+      this.extractedEventHandlers
     );
   }
 
@@ -55,12 +70,12 @@ export class Evented<Props, State> extends Component<any, any> {
    * @param {Object} fromProps
    */
   extractEventHandlers(fromProps: any) {
-    // takes all event functions passed to the component in props if in mapEventTypes
-    // and saves it in the extractedEvents Object
+    // takes all event functions passed to the component in props if in recognizedEventTypes
+    // and saves it in the extractedEventHandlers Object
     return Object.keys(fromProps).reduce((acc: any, propName) => {
       if (
         fromProps[propName] !== null &&
-        this.mapEventTypes.includes(propName)
+        this.recognizedEventTypes.includes(propName)
       ) {
         acc[propName] = fromProps[propName];
       }
@@ -73,10 +88,11 @@ export class Evented<Props, State> extends Component<any, any> {
   }
 
   /**
-   * binds and rebinds passed event handler functions to the component
+   * Binds and re-binds passed event handler functions to the component
    * @param {EventsObject} next
    * @param {EventsObject} prev
    * @param eventEmitter
+   * @return {EventsObject} event object containing event handlers which are binded to event emitter
    */
   bindEvents(
     next: EventsObject,
@@ -96,8 +112,7 @@ export class Evented<Props, State> extends Component<any, any> {
         eventHandler /* function to handle event, passed to component*/
       ]) => {
         if (prev[eventType] !== next[eventType] || !next[eventType]) {
-          // if next event handler changed or was does not exist in next eventObject
-          // it will be removed from eventEmitter
+          // if next event handler changed it will be removed from eventEmitter
           eventEmitter.off(eventType, eventHandler);
         }
         // keep unchanged event handlers
@@ -122,7 +137,7 @@ export class Evented<Props, State> extends Component<any, any> {
    * @param element
    */
   unbindEvents(
-    eventsObject: EventsObject = this.extractedEvents,
+    eventsObject: EventsObject = this.extractedEventHandlers,
     element = this.mapElement
   ): void {
     if (!element) return;
@@ -132,5 +147,9 @@ export class Evented<Props, State> extends Component<any, any> {
         element.off(eventType, eventHandleFunction);
       }
     );
+  }
+
+  fireEvent(eventType: string, data?: any) {
+    if (this.mapElement) this.mapElement.fire(eventType, data);
   }
 }
