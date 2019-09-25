@@ -2,7 +2,7 @@ import React, { Component, Fragment } from "react";
 import { MapContextProvider } from "./Context";
 import { Evented } from "./Evented";
 
-export class MapLayer extends Evented<any, any> {
+export class MapLayer<P> extends Evented<P, any> {
   contextValue: any = null;
 
   constructor(props: any) {
@@ -12,7 +12,10 @@ export class MapLayer extends Evented<any, any> {
   componentDidMount(): void {
     super.componentDidMount();
   }
-
+  componentDidUpdate(prevProps: any, prevState: any, snapshot?: any): void {
+    super.componentDidUpdate(prevProps, prevState, snapshot);
+  }
+  
   render(): any {
     const { children } = this.props;
     if (children === null) return null;

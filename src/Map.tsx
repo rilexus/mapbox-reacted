@@ -5,7 +5,7 @@ import { MapboxOptions } from "mapbox-gl";
 import { Lat, Lng } from "./Types";
 import { MapLayer } from "./MapLayer";
 
-interface OwnProps {
+interface MapPropsI {
   accessToken: string;
   mapContainerId: string;
   style: string;
@@ -14,7 +14,7 @@ interface OwnProps {
   zoom: number;
 }
 // start at componentDiMount
-export class Map extends MapLayer {
+export class Map extends MapLayer<MapPropsI> {
   contextValue: any;
   mapElementContainer: any;
   mapElement: any;
@@ -32,17 +32,14 @@ export class Map extends MapLayer {
     };
     const map: MapBox.Map = new MapBox.Map(options);
     this.mapElement = map;
-    // this.bindEvents(this.extractedEventHandlers, {});
-    // set context for child map components
+    // set context for map child components
     this.contextValue = {
       container: this.mapElement,
       map: this.mapElement
     };
-    // rerender Map component after MapBox is created to provider MapBox instance in context
     super.componentDidMount();
-
+    // rerender Map component after MapBox is created to provider MapBox instance in context
     this.forceUpdate();
-    // see bindMapToContainer function
   }
 
   // safe ref to the map container <div/>
@@ -59,10 +56,14 @@ export class Map extends MapLayer {
     prevState: Readonly<any>,
     snapshot?: any
   ): void {
+    // extractedEventHandlers should be handled by the extended Evented class but for some reason
+    // it does not work correctly.
+    // Popup component does not appear on the map if this.extractEventHandlers(this.props);
+    // is not called explicitly
     this.extractedEventHandlers = this.extractEventHandlers(this.props);
+    super.componentDidUpdate(prevProps, prevState, snapshot);
     // TODO: handle map props update
     this.mapElement.resize();
-    super.componentDidUpdate(prevProps, prevState, snapshot);
   }
 
   render(): any {

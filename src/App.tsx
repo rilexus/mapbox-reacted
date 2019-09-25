@@ -60,7 +60,7 @@ function MyCircle() {
     <>
       <Circle
         coordinates={coords}
-        click={e => {
+        click={(e: any) => {
           console.log("my circle: ", e);
         }}
       />
@@ -139,6 +139,9 @@ const MovableLine = () => {
         options={{
           draggable: true
         }}
+        click={e => {
+          console.log("click", e);
+        }}
         lngLat={lineCoords[1] as [number, number]}
         dragend={e => {
           const eventCoords = e.target.getLngLat();
@@ -198,7 +201,9 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <Map
-        mousemove={() => {}}
+        mousemove={() => {
+          console.log("move");
+        }}
         move={() => {}}
         click={hidePopup}
         accessToken={token}
@@ -214,7 +219,6 @@ const App: React.FC = () => {
         <Popup lngLat={[6.0839, 50.7793]}>Map</Popup>
         <LayerGroup>
           <Layer
-            click={(e: any) => {}}
             move={() => {}}
             layerName={"my-poly"}
             type={LayerTypes.Fill}
@@ -239,10 +243,10 @@ const App: React.FC = () => {
               properties={{
                 name: "testpily 2"
               }}
-              mouseover={e => {
+              mouseover={(e: any) => {
                 // console.log("over", e.lngLat);
               }}
-              click={e => {
+              click={(e: any) => {
                 console.log("poly 2");
                 showPopup([e.lngLat.lng, e.lngLat.lat]);
               }}
@@ -252,7 +256,7 @@ const App: React.FC = () => {
               properties={{
                 name: "testpily 1"
               }}
-              click={e => {
+              click={(e: any) => {
                 console.log("poly 1");
                 showPopup([e.lngLat.lng, e.lngLat.lat]);
               }}

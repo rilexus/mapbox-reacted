@@ -71,8 +71,8 @@ class Marker extends Evented<MarkerPropsI & MapContext, any> {
   componentDidUpdate(prevProps: any, prevState: any, snapshot?: any): void {
     const { lngLat: nextLngLat } = this.props;
     const { lngLat: prevLngLat } = prevProps;
-
-    if (nextLngLat !== prevProps) {
+    // update marker position if lngLat ref changed
+    if (nextLngLat !== prevLngLat) {
       this.marker.setLngLat(nextLngLat);
     }
 
@@ -80,29 +80,31 @@ class Marker extends Evented<MarkerPropsI & MapContext, any> {
   }
 
   componentWillUnmount(): void {
+    // remove marker from map instance if marker unmounts
     this.marker.remove();
     ReactDOM.unmountComponentAtNode(this.componentContainer);
     super.componentWillUnmount();
   }
 
-  bindMarkerContainerElement = (el: any) => {
-    this.markerContainer = el;
-  };
-
   bindComponentContainer = (el: any) => {
     this.componentContainer = el;
   };
 
+  bindMarkerContainerElement = (el: any) => {
+    this.markerContainer = el;
+  };
+
   render(): any {
-    const { children, click, mouseover, mouseleave, mouseenter } = this.props;
+    const { children } = this.props;
     if (!children) return null;
+    // if children are passed to marker render children else the default Mapbox marker will be rendered
     return (
       <span
         ref={this.bindComponentContainer}
-        onClick={click ? click : null}
-        onMouseOver={mouseover ? mouseover : null}
-        onMouseEnter={mouseenter ? mouseenter : null}
-        onMouseLeave={mouseleave ? mouseleave : null}
+        onClick={e => this.fireEvent("click", e)}
+        onMouseOver={e => this.fireEvent("mouseover", e)}
+        onMouseEnter={e => this.fireEvent("mouseenter", e)}
+        onMouseLeave={e => this.fireEvent("mouseleave", e)}
       >
         <span ref={this.bindMarkerContainerElement}>{children}</span>
       </span>

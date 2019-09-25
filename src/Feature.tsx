@@ -12,7 +12,7 @@ export interface FeatureProps {
 interface FeatureStateI {
   __id: string;
 }
-export default class Feature<P, State> extends MapLayer {
+export default class Feature<P, State> extends MapLayer<P> {
   featureType: FeatureTypes;
 
   constructor(props: any) {

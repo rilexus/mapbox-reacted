@@ -39,7 +39,12 @@ interface LayerStateI {
   layerID: string;
 }
 
-interface LayerProps {
+interface LayerEventsI {
+  click?: EventHandler;
+  move?: EventHandler;
+}
+
+interface LayerProps extends LayerEventsI {
   layerName: string;
 
   circlePaint?: CirclePaint;
@@ -84,7 +89,7 @@ export type FeatureStyle = {
  * Feature child component uses passed functions through context: addFeature, removeFeature etc to add itself to the layers data source
  * NOTE: currently layers for children with own style are not removed if the child unmounts. This can cause performance issues!
  */
-class Layer extends MapLayer {
+class Layer extends MapLayer<LayerProps> {
   contextValue: any;
   constructor(props: any) {
     super(props);
@@ -274,19 +279,7 @@ class Layer extends MapLayer {
       console.error(e);
     }
   }
-  // render(): any {
-  //   const { children } = this.props;
-  //   if (children === null) return null;
-  //   if (this.contextValue) {
-  //     return (
-  //       <MapContextProvider value={this.contextValue}>
-  //         {children}
-  //       </MapContextProvider>
-  //     );
-  //   }
-  //   return <>{children}</>;
-  // }
 }
 
 // make map context available in this component
-export default withMapContext(Layer);
+export default withMapContext<LayerProps, any>(Layer);
