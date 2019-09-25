@@ -1,38 +1,15 @@
-import React, { Component } from "react";
-import { MapContextProvider, withMapContext } from "./Context";
-import GeoJSONSource from "./LayerGroup";
+import React from "react";
+import { withMapContext } from "./Context";
 
 import uuid from "uuid";
 import {
-  BackgroundLayout,
-  BackgroundPaint,
-  FillExtrusionLayout,
-  FillExtrusionPaint,
-  RasterLayout,
-  RasterPaint,
-  SymbolLayout,
-  SymbolPaint,
-  HeatmapLayout,
-  HeatmapPaint,
-  HillshadeLayout,
-  HillshadePaint,
-  GeoJSONSource as MapboxGeoJSONSource
-} from "mapbox-gl";
-import {
-  CircleLayout,
-  CirclePaint,
-  EventHandler,
-  EventsObject,
-  EventType,
-  FeatureTypes,
-  FillLayout,
   FillPaint,
-  LayerTypes,
-  LineLayout,
+  CirclePaint,
+  CircleLayout,
   LinePaint,
-  MapContext
-} from "./Types";
-import { StyleUtils } from "./utils";
+  LineLayout
+} from "mapbox-gl";
+import { EventHandler, EventType, FillLayout, LayerTypes } from "./Types";
 import { MapLayer } from "./MapLayer";
 
 interface LayerStateI {
@@ -60,35 +37,6 @@ interface LayerProps extends LayerEventsI {
   filter?: string[];
 }
 
-export type FeatureStyle = {
-  paint?:
-    | BackgroundPaint
-    | FillExtrusionPaint
-    | SymbolPaint
-    | RasterPaint
-    | HeatmapPaint
-    | FillPaint
-    | LinePaint
-    | CirclePaint
-    | HillshadePaint
-    | any;
-  layout?:
-    | BackgroundLayout
-    | FillLayout
-    | FillExtrusionLayout
-    | LineLayout
-    | SymbolLayout
-    | RasterLayout
-    | CircleLayout
-    | HeatmapLayout
-    | HillshadeLayout;
-};
-
-/**
- * @desc Manages passed Feature child components: Polygon, Line, Circle etc.
- * Feature child component uses passed functions through context: addFeature, removeFeature etc to add itself to the layers data source
- * NOTE: currently layers for children with own style are not removed if the child unmounts. This can cause performance issues!
- */
 class Layer extends MapLayer<LayerProps> {
   contextValue: any;
   constructor(props: any) {
@@ -106,14 +54,11 @@ class Layer extends MapLayer<LayerProps> {
     this.updateLayerStyle = this.updateLayerStyle.bind(this);
     // updates feature coordinates, paint, layout
     this.updateFeature = this.updateFeature.bind(this);
-
-    // if like to know hoe this class works, start at the componentDidMount function
   }
 
   /**
-   * @desc Adds passed feature to Layer data source. If a style or eventsObject prop is given, it add a new/unique layer for this feature.
+   * @desc Adds geoJSON feature to the data source
    * @param newFeature
-   * @param style
    */
   addFeature(newFeature: any): void {
     const {
@@ -169,16 +114,20 @@ class Layer extends MapLayer<LayerProps> {
           let _filter: string[] = [""];
 
           if (type === LayerTypes.Fill) {
-            paint = StyleUtils.transformFillPaint(fillPaint);
-            layout = StyleUtils.transformFillPaint(fillLayout);
+            // paint = StyleUtils.transformFillPaint(fillPaint);
+            // layout = StyleUtils.transformFillPaint(fillLayout);
+            paint = fillPaint;
+            layout = fillLayout;
             _filter = ["==", "$type", "Polygon"];
           }
           if (type === LayerTypes.Circle) {
-            paint = StyleUtils.transformCirclePaint(circlePaint);
+            // paint = StyleUtils.transformCirclePaint(circlePaint);
+            paint = circlePaint;
             _filter = ["==", "$type", "Point"];
           }
           if (type === LayerTypes.Line) {
-            paint = StyleUtils.transformLinePaint(linePaint);
+            // paint = StyleUtils.transformLinePaint(linePaint);
+            paint = linePaint;
             _filter = ["==", "$type", "LineString"];
           }
 

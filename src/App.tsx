@@ -97,12 +97,12 @@ const MovableLine = () => {
   ]);
   return (
     <Layer
-      layerName={"my-line"}
+      layerName={"my-lines"}
       type={LayerTypes.Line}
       linePaint={{
-        color: "#ed6498",
-        width: 5,
-        opacity: 0.8
+        "line-color": "#eced44",
+        "line-width": 5,
+        "line-opacity": 0.8
       }}
     >
       <Marker
@@ -219,10 +219,22 @@ const App: React.FC = () => {
         <Popup lngLat={[6.0839, 50.7793]}>Map</Popup>
         <LayerGroup>
           <Layer
+            layerName={"lines"}
+            type={LayerTypes.Line}
+            linePaint={{
+              "line-color": "#004f4f",
+              "line-width": 5
+            }}
+            filter={["==", "$type", "Polygon"]}
+          />
+          <Layer
             move={() => {}}
             layerName={"my-poly"}
             type={LayerTypes.Fill}
-            fillPaint={{ color: "#088", opacity: 0.8 }}
+            fillPaint={{
+              "fill-color": "#088",
+              "fill-opacity": 0.8
+            }}
             fillLayout={{ visibility: "visible" }}
           >
             {popup.visible ? (
@@ -268,8 +280,8 @@ const App: React.FC = () => {
             layerName={"my-circles"}
             type={LayerTypes.Circle}
             circlePaint={{
-              radius: 5,
-              color: "green"
+              "circle-radius": 5,
+              "circle-color": "green"
             }}
           >
             <MyCircle />
