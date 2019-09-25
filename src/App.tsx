@@ -174,11 +174,31 @@ const App: React.FC = () => {
     visible: false,
     coordinates: [6.0839, 50.7753] as [number, number]
   });
+  const [windowDimensions, setWindowDimensions] = useState({
+    height: window.innerHeight,
+    width: window.innerWidth
+  });
+
   const token =
     "pk.eyJ1Ijoic3RhbmlzMTk5MiIsImEiOiJjam14cXZsMW4xNjQ0M2tydWRjYTdtZnNnIn0.UKGr3I6KmigqCy8cR5ZHZw";
   const center = [6.0839, 50.7753] as [Lat, Lng];
   const style = "mapbox://styles/stanis1992/ck0l708861x8m1cpqhi1l0p4p";
   // const style = "mapbox://styles/mapbox/dark-v10";
+
+  const handleResize = (e: any) => {
+    setWindowDimensions({
+      height: e.target.innerHeight,
+      width: e.target.innerWidth
+    });
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   useEffect(() => {
     setTimeout(() => {
       setVisible(false);
@@ -212,8 +232,8 @@ const App: React.FC = () => {
         center={center}
         zoom={14}
         containerStyle={{
-          height: window.innerHeight,
-          width: window.innerWidth
+          height: windowDimensions.height,
+          width: windowDimensions.width
         }}
       >
         <Popup lngLat={[6.0839, 50.7793]}>Map</Popup>
