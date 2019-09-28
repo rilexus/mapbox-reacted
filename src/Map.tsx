@@ -2,7 +2,7 @@ import React, { CSSProperties } from "react";
 import * as MapBox from "mapbox-gl";
 import { MapContextProvider } from "./context";
 import { MapboxOptions } from "mapbox-gl";
-import { Lat, Lng } from "./Types";
+import { Lat, Lng } from "./types";
 import { MapLayer } from "./MapLayer";
 
 interface MapPropsI {
@@ -14,7 +14,7 @@ interface MapPropsI {
   zoom: number;
 }
 // start at componentDiMount
-export class Map extends MapLayer<MapPropsI> {
+export default class Map extends MapLayer<MapPropsI, {}> {
   contextValue: any;
   mapElementContainer: any;
   mapElement: any;

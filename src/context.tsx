@@ -6,7 +6,7 @@ import React, {
   forwardRef,
   useContext
 } from "react";
-import { MapContext } from "./Types";
+import { MapContext } from "./types";
 
 const _MapContext = createContext<MapContext>({});
 export const MapContextConsumer = _MapContext.Consumer;

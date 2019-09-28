@@ -1,8 +1,6 @@
 import React from "react";
 import uuid from "uuid";
-import { Evented } from "./Evented";
-import { EventHandler, EventType, FeatureTypes } from "./Types";
-import { StyleUtils } from "./utils";
+import { EventHandler, EventType, FeatureTypes } from "./types";
 import { MapLayer } from "./MapLayer";
 
 export interface FeatureProps {
@@ -12,7 +10,7 @@ export interface FeatureProps {
 interface FeatureStateI {
   __id: string;
 }
-export default class Feature<P, State> extends MapLayer<P> {
+export default class Feature<P, State> extends MapLayer<P, State> {
   featureType: FeatureTypes;
 
   constructor(props: any) {
@@ -74,24 +72,23 @@ export default class Feature<P, State> extends MapLayer<P> {
       mapbox: { layer, map }
     } = this.props;
 
-    this.extractedEventHandlers = Object.entries(this.extractedEventHandlers).reduce(
-      (acc, [eventType, eventHandler]) => {
-        const eventFilter = (e: any) => {
-          const { __id } = this.state;
+    this.extractedEventHandlers = Object.entries(
+      this.extractedEventHandlers
+    ).reduce((acc, [eventType, eventHandler]) => {
+      const eventFilter = (e: any) => {
+        const { __id } = this.state;
 
-          // if the feature __id in the fired event is same as the current feature __id
-          // the event will be passed(filtered) along, else dont.
-          if (e.features[0].properties.__id === __id) {
-            eventHandler(e);
-          }
-        };
-        return {
-          ...acc,
-          [eventType]: eventFilter
-        };
-      },
-      {}
-    );
+        // if the feature __id in the fired event is same as the current feature __id
+        // the event will be passed(filtered) along, else dont.
+        if (e && e.features && e.features[0].properties.__id === __id) {
+          eventHandler(e);
+        }
+      };
+      return {
+        ...acc,
+        [eventType]: eventFilter
+      };
+    }, {});
     if (layer) {
       Object.entries(this.extractedEventHandlers).forEach(
         ([eventType, eventHandleFunction]: [EventType, EventHandler]) => {

@@ -1,12 +1,16 @@
 import React from "react";
 import { withMapContext } from "./context";
 import Feature, { FeatureProps } from "./Feature";
-import { EventHandler, FeatureTypes } from "./Types";
+import { EventHandler, FeatureTypes } from "./types";
 
-interface PolygonProps extends FeatureProps {
-  coordinates: number[][][];
+interface PolygonEvents {
   click?: EventHandler;
   mouseover?: EventHandler;
+  mouseenter?: EventHandler;
+}
+
+interface PolygonProps extends FeatureProps, PolygonEvents {
+  coordinates: number[][][];
 }
 interface PolygonState {}
 
@@ -31,7 +35,6 @@ class Polygon extends Feature<PolygonProps, PolygonState> {
   componentWillUnmount(): void {
     super.componentWillUnmount();
   }
- 
 }
 
 export default withMapContext<PolygonProps, any>(Polygon);

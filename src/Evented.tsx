@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { EventHandler, EventsObject, EventType } from "./Types";
+import { EventHandler, EventsObject, EventType } from "./types";
 
 /**
  * NOTE: "event handler" refers to a function passed to a component which will be called

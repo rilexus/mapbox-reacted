@@ -1,7 +1,7 @@
 import React from "react";
 import {withMapContext} from "./context";
 import Feature, {FeatureProps} from "./Feature";
-import {EventHandler, FeatureTypes } from "./Types";
+import {EventHandler, FeatureTypes } from "./types";
 
 
 interface LineProps extends FeatureProps{

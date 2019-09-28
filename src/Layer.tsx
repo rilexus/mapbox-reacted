@@ -8,7 +8,7 @@ import {
   LineLayout,
   FillLayout
 } from "mapbox-gl";
-import { EventHandler, LayerTypes, MapContext } from "./Types";
+import { EventHandler, LayerTypes, MapContext } from "./types";
 import { MapLayer } from "./MapLayer";
 import { withMapContext } from "./context";
 

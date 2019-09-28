@@ -1,4 +1,4 @@
-import {FeatureTypes} from "./Types";
+import {FeatureTypes} from "./types";
 
 function splitStyle(style: { [key: string]: any }) {
 	// split by UpperCase letter, to lower case and join with "-"

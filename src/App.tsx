@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Map } from "./Map";
 import Layer from "./Layer";
 import Polygon from "./Polygon";
-import { Lat, LayerTypes, Lng } from "./Types";
+import { Lat, LayerTypes, Lng } from "./types";
 import Line from "./Line";
 import Circle from "./Circle";
 import LayerSource from "./LayerSource";
