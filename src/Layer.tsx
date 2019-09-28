@@ -38,7 +38,7 @@ interface LayerProps extends LayerEventsI {
   filter?: string[];
 }
 
-class Layer extends MapLayer<LayerProps & MapContext> {
+class Layer extends MapLayer<LayerProps & MapContext, LayerStateI> {
   contextValue: any;
   constructor(props: any) {
     super(props);
@@ -209,11 +209,20 @@ class Layer extends MapLayer<LayerProps & MapContext> {
 
     const newFeatures = oldFeatures.map((feature: any) => {
       const { __id } = feature.properties;
-      if (__id === featureID) {
-        feature.geometry.coordinates = [...coordinates];
-        feature.properties = { ...properties };
-      }
-      return feature;
+      if (__id != featureID) return feature;
+
+      const updatedFeature = {
+        ...feature,
+        geometry: {
+          ...feature.geometry,
+          coordinates: [...coordinates]
+        },
+        properties: {
+          ...feature.properties,
+          ...properties
+        }
+      };
+      return updatedFeature;
     });
     setFeatures(newFeatures);
   }
