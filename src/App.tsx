@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Map } from "./Map";
+import { Map } from "./index";
 import Layer from "./Layer";
 import Polygon from "./Polygon";
 import { Lat, LayerTypes, Lng } from "./types";
