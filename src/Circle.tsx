@@ -1,14 +1,7 @@
 import React from "react";
-import { withMapContext } from "./Context";
+import { withMapContext } from "./context";
 import Feature, { FeatureProps } from "./Feature";
-import {
-  CircleLayout,
-  CirclePaint,
-  EventHandler,
-  FeatureTypes,
-  Lat,
-  Lng
-} from "./Types";
+import { EventHandler, FeatureTypes, Lat, Lng } from "./Types";
 
 interface CircleProps extends FeatureProps {
   coordinates: [Lng, Lat];

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import * as MapBox from "mapbox-gl";
-import { withMapContext } from "./Context";
+import { withMapContext } from "./context";
 import { EventHandler, MapContext } from "./Types";
 import { LngLatLike } from "mapbox-gl";
 import uuid from "uuid";

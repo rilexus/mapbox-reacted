@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from "react";
-import { MapContextProvider } from "./Context";
+import { MapContextProvider } from "./context";
 import { Evented } from "./Evented";
 
 export class MapLayer<P> extends Evented<P, any> {

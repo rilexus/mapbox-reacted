@@ -5,7 +5,7 @@ import Polygon from "./Polygon";
 import { Lat, LayerTypes, Lng } from "./Types";
 import Line from "./Line";
 import Circle from "./Circle";
-import LayerGroup from "./LayerGroup";
+import LayerSource from "./LayerSource";
 import Popup from "./Popup";
 import Marker from "./Marker";
 
@@ -237,7 +237,7 @@ const App: React.FC = () => {
         }}
       >
         <Popup lngLat={[6.0839, 50.7793]}>Map</Popup>
-        <LayerGroup>
+        <LayerSource>
           <Layer
             layerName={"lines"}
             type={LayerTypes.Line}
@@ -306,7 +306,7 @@ const App: React.FC = () => {
           >
             <MyCircle />
           </Layer>
-        </LayerGroup>
+        </LayerSource>
       </Map>
     </div>
   );

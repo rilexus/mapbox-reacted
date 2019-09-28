@@ -1,19 +1,20 @@
 import React from "react";
-import { withMapContext } from "./Context";
-
 import uuid from "uuid";
 import {
   FillPaint,
   CirclePaint,
   CircleLayout,
   LinePaint,
-  LineLayout
+  LineLayout,
+  FillLayout
 } from "mapbox-gl";
-import { EventHandler, EventType, FillLayout, LayerTypes } from "./Types";
+import { EventHandler, LayerTypes, MapContext } from "./Types";
 import { MapLayer } from "./MapLayer";
+import { withMapContext } from "./context";
 
 interface LayerStateI {
   layerID: string;
+  serializedLayer: any;
 }
 
 interface LayerEventsI {
@@ -37,7 +38,7 @@ interface LayerProps extends LayerEventsI {
   filter?: string[];
 }
 
-class Layer extends MapLayer<LayerProps> {
+class Layer extends MapLayer<LayerProps & MapContext> {
   contextValue: any;
   constructor(props: any) {
     super(props);
@@ -79,6 +80,25 @@ class Layer extends MapLayer<LayerProps> {
     } = this.props;
     removeFeatures([id]);
   }
+
+  reAddLayer = () => {
+    const {
+      mapbox: { map }
+    } = this.props;
+    const { layer: curLayer } = this.state;
+    if (curLayer) {
+      const { id: curLayerID } = curLayer;
+      const layerExistOnMap = map
+        .getStyle()
+        .layers.some(
+          ({ id: layerOnMapID }: { id: string }) => layerOnMapID === curLayerID
+        );
+      if (!layerExistOnMap) {
+        map.addLayer(curLayer.serialize());
+      }
+    }
+  };
+
   /**
    * @desc Creates layer attached to a source and passes own context to the children
    */
@@ -101,43 +121,42 @@ class Layer extends MapLayer<LayerProps> {
       const layerID = `${layerName}-${uuid()}`;
       const sourceID = source.id;
 
+      let paint = {};
+      let layout = {};
+      let _filter: string[] = [""];
+
+      if (type === LayerTypes.Fill) {
+        paint = fillPaint;
+        layout = fillLayout;
+        _filter = ["==", "$type", "Polygon"];
+      }
+      if (type === LayerTypes.Circle) {
+        paint = circlePaint;
+        _filter = ["==", "$type", "Point"];
+      }
+      if (type === LayerTypes.Line) {
+        paint = linePaint;
+        _filter = ["==", "$type", "LineString"];
+      }
+
+      const layerOptions = {
+        id: layerID,
+        type: type,
+        source: sourceID,
+        paint: paint,
+        layout: layout,
+        filter: filter || _filter
+      };
+      map.addLayer(layerOptions);
+      const layer = map.getLayer(layerID);
+
       this.setState(
-        (curState: LayerStateI) => {
-          return {
-            ...curState,
-            layerID: layerID
-          };
-        },
+        (curState: LayerStateI) => ({
+          ...curState,
+          layerID: layerID,
+          layer: layer
+        }),
         () => {
-          let paint = {};
-          let layout = {};
-          let _filter: string[] = [""];
-
-          if (type === LayerTypes.Fill) {
-            paint = fillPaint;
-            layout = fillLayout;
-            _filter = ["==", "$type", "Polygon"];
-          }
-          if (type === LayerTypes.Circle) {
-            paint = circlePaint;
-            _filter = ["==", "$type", "Point"];
-          }
-          if (type === LayerTypes.Line) {
-            paint = linePaint;
-            _filter = ["==", "$type", "LineString"];
-          }
-
-          const layerOptions = {
-            id: layerID,
-            type: type,
-            source: sourceID,
-            paint: paint,
-            layout: layout,
-            filter: filter || _filter
-          };
-          map.addLayer(layerOptions);
-          const layer = map.getLayer(layerID);
-
           this.contextValue = {
             ...this.props.mapbox,
             layer: {
@@ -200,6 +219,10 @@ class Layer extends MapLayer<LayerProps> {
   }
 
   componentDidMount(): void {
+    const {
+      mapbox: { map }
+    } = this.props;
+    map.on("styledata", this.reAddLayer);
     this.init();
   }
 
@@ -208,6 +231,8 @@ class Layer extends MapLayer<LayerProps> {
       mapbox: { map }
     } = this.props;
     try {
+      map.off("styledata", this.reAddLayer);
+
       const { layerID } = this.state;
       if (layerID) {
         map.removeLayer(layerID);
