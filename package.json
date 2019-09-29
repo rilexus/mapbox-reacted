@@ -23,12 +23,9 @@
     "build:umd:min": "cross-env BABEL_ENV=rollup NODE_ENV=production rollup -c"
   },
   "files": [
-    ".babelrc",
     "dist/*",
     "es/*",
-    "lib/*",
-    "src/*",
-    "cjs/*"
+    "lib/*"
   ],
   "dependencies": {
     "uuid": "3.3.3"
