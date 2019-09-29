@@ -1,8 +1,8 @@
 import React from 'react';
 import { MapContextProvider } from './context';
-import { Evented } from './Evented';
+import Evented from './Evented';
 
-export class MapLayer<P, S> extends Evented<P, any> {
+export default class MapLayer<P, S> extends Evented<P, any> {
   contextValue: any = null;
 
   constructor(props: any) {

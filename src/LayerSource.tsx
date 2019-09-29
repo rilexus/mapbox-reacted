@@ -164,4 +164,4 @@ class LayersSource<P, S> extends Component<P & any, S & ILayerSourceState> {
     return <>{children}</>;
   }
 }
-export default withMapContext(LayersSource);
+export default withMapContext<ILayerSourceState, any>(LayersSource);

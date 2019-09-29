@@ -1,7 +1,7 @@
 import Mapbox, { MapboxOptions } from 'mapbox-gl';
 import React, { CSSProperties } from 'react';
 import { MapContextProvider } from './context';
-import { MapLayer } from './MapLayer';
+import MapLayer from './MapLayer';
 import { Lat, Lng } from './types';
 
 interface IMapProps {

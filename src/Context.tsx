@@ -2,7 +2,6 @@ import React, {
   ComponentClass,
   ComponentType,
   createContext,
-  FC,
   forwardRef,
   useContext,
 } from 'react';

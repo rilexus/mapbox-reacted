@@ -13,7 +13,7 @@ import { EventHandler, EventsObject, EventType } from './types';
  * 3. unbinds event handlers on component unmount
  * 4. allows firing events supported by event emitter
  */
-export class Evented<Props, State> extends Component<any, any> {
+export default class Evented<Props, State> extends Component<any, any> {
   recognizedEventTypes = [
     'dblclick',
     'dragend',

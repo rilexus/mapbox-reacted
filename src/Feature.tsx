@@ -1,7 +1,7 @@
 import React from 'react';
 import uuid from 'uuid';
 import { EventHandler, EventType, FeatureTypes } from './types';
-import { MapLayer } from './MapLayer';
+import MapLayer from './MapLayer';
 
 export interface IFeatureProps {
   coordinates: any;

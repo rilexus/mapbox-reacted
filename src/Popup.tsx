@@ -89,4 +89,4 @@ class Popup extends Component<IPopupPropsI & IMapContext, any> {
   }
 }
 
-export default withMapContext(Popup);
+export default withMapContext<IPopupPropsI, any>(Popup);

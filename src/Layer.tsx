@@ -9,7 +9,7 @@ import {
   FillLayout,
 } from 'mapbox-gl';
 import { EventHandler, LayerTypes, IMapContext } from './types';
-import { MapLayer } from './MapLayer';
+import MapLayer from './MapLayer';
 import { withMapContext } from './context';
 
 interface ILayerState {
