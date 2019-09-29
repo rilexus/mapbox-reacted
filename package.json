@@ -12,9 +12,10 @@
     "clean": "rimraf lib es dist ts-build",
     "type-check": "tsc --noEmit",
     "lint": "tslint ./src/*",
+    "validate": "tslint ./src/*",
     "prettify": " prettier --write --config ./.prettierrc ./src/*",
     "type-check:watch": "npm run type-check -- --watch",
-    "build": "npm run clean && npm run build:ts && run-p build:umd build:es build:cjs build:umd:min && rimraf ts-build",
+    "build": "npm run clean && npm run build:ts && npm-run-all --parallel build:umd build:es build:cjs build:umd:min && rimraf ts-build",
     "build:ts": "tsc",
     "build:umd": "cross-env BABEL_ENV=rollup NODE_ENV=development rollup -c",
     "build:es": "cross-env BABEL_ENV=jsnext babel src --out-dir es --extensions \".ts,.tsx\"",
@@ -62,6 +63,7 @@
     "babel-plugin-dev-expression": "0.2.2",
     "cross-env": "6.0.0",
     "file-loader": "4.2.0",
+    "ghooks": "^2.0.4",
     "jest": "24.9.0",
     "mapbox-gl": "^1.3.1",
     "npm-run-all": "^4.1.5",
@@ -87,6 +89,11 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/rilexus/mapbox-reacted.git"
+  },
+  "config": {
+    "ghooks": {
+      "pre-commit": "npm run validate"
+    }
   },
   "browserslist": {
     "production": [
