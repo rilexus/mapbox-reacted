@@ -11,6 +11,10 @@
 # production
 /build
 /dist
+/cjs
+/lib
+/es
+/ts-build
 
 # misc
 .DS_Store

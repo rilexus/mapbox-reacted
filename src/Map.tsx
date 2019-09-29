@@ -1,5 +1,5 @@
 import React, { CSSProperties } from "react";
-import * as MapBox from "mapbox-gl";
+import Mapbox from "mapbox-gl";
 import { MapContextProvider } from "./context";
 import { MapboxOptions } from "mapbox-gl";
 import { Lat, Lng } from "./types";
@@ -21,7 +21,7 @@ export default class Map extends MapLayer<MapPropsI, {}> {
 
   componentDidMount(): void {
     const { zoom, style, center, accessToken, mapContainerId } = this.props;
-    (MapBox as any).accessToken = accessToken;
+    (Mapbox as any).accessToken = accessToken;
 
     // create mapBox with passed props
     const options: MapboxOptions = {
@@ -30,7 +30,7 @@ export default class Map extends MapLayer<MapPropsI, {}> {
       center: center, // starting position [lng, lat]
       zoom: zoom // starting zoom
     };
-    const map: MapBox.Map = new MapBox.Map(options);
+    const map: Mapbox.Map = new Mapbox.Map(options);
     this.mapElement = map;
     // set context for map child components
     this.contextValue = {

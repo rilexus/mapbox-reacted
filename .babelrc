@@ -4,8 +4,11 @@
     "@babel/plugin-proposal-export-default-from",
     "@babel/plugin-transform-proto-to-assign",
     "@babel/plugin-transform-strict-mode",
-    "dev-expression"
+    "@babel/proposal-object-rest-spread",
+    "dev-expression",
+    "add-module-exports"
   ],
+  "presets": ["@babel/preset-typescript"],
   "env": {
     "development": {
       "presets": [
@@ -23,7 +26,11 @@
         "@babel/preset-typescript",
         "@babel/preset-react"
       ],
-      "plugins": ["@babel/plugin-transform-runtime"]
+      "plugins": [
+        "@babel/plugin-transform-runtime",
+        "@babel/plugin-proposal-export-default-from",
+        "add-module-exports"
+      ]
     },
     "rollup": {
       "presets": [
@@ -41,7 +48,9 @@
         "@babel/preset-react"
       ],
       "plugins": [
-        "@babel/plugin-transform-runtime"
+        "@babel/plugin-transform-runtime",
+        "@babel/plugin-proposal-export-default-from",
+        "add-module-exports"
       ]
     },
     "jsnext": {
@@ -61,7 +70,8 @@
         "@babel/preset-react"
       ],
       "plugins": [
-        ["@babel/plugin-transform-runtime", { "useESModules": true }]
+        ["@babel/plugin-transform-runtime", { "useESModules": true }],
+        "add-module-exports"
       ]
     }
   }

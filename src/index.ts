@@ -1,6 +1,5 @@
-export { default as Map } from "./Map";
-
 export { default as Popup } from "./Popup";
+export { default as Map } from "./Map";
 export { default as Polygon } from "./Polygon";
 export { default as Circle } from "./Circle";
 export { default as Line } from "./Line";
