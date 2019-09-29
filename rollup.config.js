@@ -15,7 +15,7 @@ const config = {
 	
 	// Specify here external modules which you don't want to include in your bundle (for instance: 'lodash', 'moment' etc.)
 	// https://rollupjs.org/guide/en#external-e-external
-	external: ['react', 'react-dom','mapboxGl','crypto'],
+	external: ['react', 'react-dom','mapboxGl','uuid'],
 	
 	plugins: [
 		// Allows node_modules resolution
@@ -46,7 +46,6 @@ const config = {
 		globals: {
 			'uuid':'uuid',
 			'mapbox-gl':'MapboxGl',
-			'crypto':'crypto',
 			react: 'React',
 			'react-dom': 'ReactDOM',
 		},
