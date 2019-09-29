@@ -1,22 +1,19 @@
 import React from 'react';
 import { withMapContext } from './context';
-import Feature, { FeatureProps } from './Feature';
+import Feature, { IFeatureProps } from './Feature';
 import { EventHandler, FeatureTypes } from './types';
 
-// tslint:disable-next-line:interface-name
-interface PolygonEvents {
+interface IPolygonEvents {
   click?: EventHandler;
   mouseover?: EventHandler;
-
   mouseenter?: EventHandler;
 }
 
-// tslint:disable-next-line:interface-name
-interface PolygonProps extends FeatureProps, PolygonEvents {
+interface IPolygonProps extends IFeatureProps, IPolygonEvents {
   coordinates: number[][][];
 }
 
-class Polygon extends Feature<PolygonProps, {}> {
+class Polygon extends Feature<IPolygonProps, {}> {
   constructor(props: any) {
     super(props);
     this.featureType = FeatureTypes.Polygon;
@@ -41,4 +38,4 @@ class Polygon extends Feature<PolygonProps, {}> {
   }
 }
 
-export default withMapContext<PolygonProps, any>(Polygon);
+export default withMapContext<IPolygonProps, any>(Polygon);

@@ -2,18 +2,17 @@ import * as MapBox from 'mapbox-gl';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { withMapContext } from './context';
-import { EventHandler, MapContextI } from './types';
+import { EventHandler, IMapContext } from './types';
 import { LngLatLike } from 'mapbox-gl';
 import uuid from 'uuid';
 
-// tslint:disable-next-line:interface-name
-interface PopupPropsI {
+interface IPopupPropsI {
   lngLat: LngLatLike;
   open?: EventHandler;
   close?: EventHandler;
 }
 
-class Popup extends Component<PopupPropsI & MapContextI, any> {
+class Popup extends Component<IPopupPropsI & IMapContext, any> {
   popup: MapBox.Popup;
   popupContainer: any;
   containerEl: any;
@@ -54,7 +53,7 @@ class Popup extends Component<PopupPropsI & MapContextI, any> {
     }
   }
   componentDidUpdate(
-    prevProps: Readonly<PopupPropsI & MapContextI>,
+    prevProps: Readonly<IPopupPropsI & IMapContext>,
     prevState: Readonly<any>,
     snapshot?: any
   ): void {

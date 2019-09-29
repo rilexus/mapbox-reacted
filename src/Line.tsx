@@ -1,15 +1,14 @@
 import React from 'react';
 import { withMapContext } from './context';
-import Feature, { FeatureProps } from './Feature';
+import Feature, { IFeatureProps } from './Feature';
 import { EventHandler, FeatureTypes } from './types';
 
-interface LineProps extends FeatureProps {
+interface ILineProps extends IFeatureProps {
   coordinates: number[][];
   click?: EventHandler;
 }
-interface LineState {}
 
-class Line extends Feature<LineProps, LineState> {
+class Line extends Feature<ILineProps, {}> {
   constructor(props: any) {
     super(props);
     this.featureType = FeatureTypes.LineString;
@@ -29,4 +28,4 @@ class Line extends Feature<LineProps, LineState> {
   }
 }
 
-export default withMapContext<LineProps, any>(Line);
+export default withMapContext<ILineProps, any>(Line);

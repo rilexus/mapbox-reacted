@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import uuid from 'uuid';
 import { MapContextProvider, withMapContext } from './context';
 
-interface LayerSourceStateI {
+interface ILayerSourceState {
   sourceID: string;
   source: any;
 }
@@ -10,7 +10,7 @@ interface LayerSourceStateI {
 /**
  * Adds data geoJson data source to the component which extends this class
  */
-class LayersSource<P, S> extends Component<P & any, S & LayerSourceStateI> {
+class LayersSource<P, S> extends Component<P & any, S & ILayerSourceState> {
   contextValue: any;
 
   constructor(props: any) {
@@ -38,8 +38,8 @@ class LayersSource<P, S> extends Component<P & any, S & LayerSourceStateI> {
     const source = this.getSource();
     if (source) {
       source.setData({
+        features,
         type: 'FeatureCollection',
-        features: features,
       });
     }
     this.forceUpdate();
@@ -57,7 +57,7 @@ class LayersSource<P, S> extends Component<P & any, S & LayerSourceStateI> {
     if (this.state) {
       const { source, sourceID } = this.state;
       const oldSource = map.getSource(sourceID);
-      // at this point map has dropped old source
+      // At this point map has dropped old source
       if (source && !oldSource) {
         map.addSource(sourceID, source.serialize());
       }
@@ -76,30 +76,30 @@ class LayersSource<P, S> extends Component<P & any, S & LayerSourceStateI> {
 
     const sourceID = uuid();
     map.addSource(sourceID, {
-      type: 'geojson',
       data: {
-        type: 'FeatureCollection',
         features: [],
+        type: 'FeatureCollection',
       },
+      type: 'geojson',
     });
     const source = map.getSource(sourceID);
 
     this.setState(
       state => ({
         ...state,
-        sourceID: sourceID,
-        source: source, // save source ref in state to be used in reAddSource function
+        source, // Save source ref in state to be used in reAddSource function
+        sourceID,
       }),
 
       () => {
         this.contextValue = {
           ...this.props.mapbox,
           container: {
-            source,
-            setFeatures: this.setFeatures,
-            getSource: this.getSource,
             getFeatures: this.getFeatures,
+            getSource: this.getSource,
             removeFeatures: this.removeFeatures,
+            setFeatures: this.setFeatures,
+            source,
           },
         };
         this.forceUpdate();
@@ -112,7 +112,7 @@ class LayersSource<P, S> extends Component<P & any, S & LayerSourceStateI> {
       mapbox: { map },
     } = this.props;
 
-    // unsubscribe on unmount
+    // Unsubscribe on unmount
     map.on(
       'styledata',
       /*
@@ -124,10 +124,11 @@ class LayersSource<P, S> extends Component<P & any, S & LayerSourceStateI> {
       this.reAddSource
     );
 
-    // unsubscribe on unmount
+    // Unsubscribe on unmount
     map.on('load', this.init);
   }
 
+  // tslint:disable-next-line:variable-name
   removeFeatures(__ids: string[]): void {
     const features = this.getFeatures();
     const newFeatures = features.filter(({ properties }: any) => {
@@ -150,7 +151,9 @@ class LayersSource<P, S> extends Component<P & any, S & LayerSourceStateI> {
 
   render(): any {
     const { children } = this.props;
-    if (children === null) return null;
+    if (children === null) {
+      return null;
+    }
     if (this.contextValue) {
       return (
         <MapContextProvider value={this.contextValue}>

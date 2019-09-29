@@ -1,15 +1,14 @@
 import React from 'react';
 import { withMapContext } from './context';
-import Feature, { FeatureProps } from './Feature';
+import Feature, { IFeatureProps } from './Feature';
 import { EventHandler, FeatureTypes, Lat, Lng } from './types';
 
-interface CircleProps extends FeatureProps {
+interface ICircleProps extends IFeatureProps {
   coordinates: [Lng, Lat];
   click?: EventHandler;
 }
-interface CircleState {}
 
-class Circle extends Feature<CircleProps, CircleState> {
+class Circle extends Feature<ICircleProps, {}> {
   constructor(props: any) {
     super(props);
     this.featureType = FeatureTypes.Point;
@@ -34,4 +33,4 @@ class Circle extends Feature<CircleProps, CircleState> {
   }
 }
 
-export default withMapContext<CircleProps, any>(Circle);
+export default withMapContext<ICircleProps, any>(Circle);

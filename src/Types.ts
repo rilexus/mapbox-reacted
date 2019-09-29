@@ -5,11 +5,9 @@ export type Lat = number;
 export type Lng = number;
 export type EventType = string;
 export type EventHandler = (event: any) => void;
-// tslint:disable-next-line:interface-name
-export interface EventsObject { [key: string]: EventHandler };
+export type EventsObject = { [key: string]: EventHandler };
 
-// tslint:disable-next-line:interface-name
-export interface Layer {
+export interface ILayer {
   addFeature: (feature: any) => void;
   removeFeature: (id: string) => void;
 }
@@ -25,12 +23,12 @@ export enum LayerTypes {
   Circle = 'circle',
   Line = 'line',
 }
-// tslint:disable-next-line:interface-name
-export interface MapContextI {
+
+export interface IMapContext {
   mapbox?: {
     map?: Map;
     layer?: {
-      layer: Layer & any;
+      layer: ILayer & any;
       updateFeature: (...args: any) => void;
       removeFeature: (...args: any) => void;
       addFeature: (...args: any) => void;

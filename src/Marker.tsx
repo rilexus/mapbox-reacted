@@ -2,10 +2,10 @@ import React from 'react';
 import * as MapBox from 'mapbox-gl';
 import ReactDOM from 'react-dom';
 import { withMapContext } from './context';
-import { EventHandler, MapContextI } from './types';
+import { EventHandler, IMapContext } from './types';
 import { Evented } from './Evented';
 
-interface MarkerEvents {
+interface IMarkerEvents {
   dragend?: EventHandler;
   click?: EventHandler;
   dragStart?: EventHandler;
@@ -15,7 +15,7 @@ interface MarkerEvents {
   mouseleave?: EventHandler;
 }
 
-interface MarkerPropsI extends MarkerEvents {
+interface IMarkerPropsI extends IMarkerEvents {
   options: {
     draggable: boolean;
     color?: string;
@@ -35,7 +35,7 @@ interface MarkerPropsI extends MarkerEvents {
   lngLat: [number, number];
 }
 
-class Marker extends Evented<MarkerPropsI & MapContextI, any> {
+class Marker extends Evented<IMarkerPropsI & IMapContext, any> {
   marker: MapBox.Marker;
   markerContainer: any = null;
   componentContainer: any;
@@ -57,8 +57,8 @@ class Marker extends Evented<MarkerPropsI & MapContextI, any> {
       element: this.markerContainer,
     });
     this.marker = marker;
-    // set mapElement to marker => event handle functions passed to this component
-    // will be attached to the marker instance by the Evented class
+    // Set mapElement to marker => event handle functions passed to this component
+    // Will be attached to the marker instance by the Evented class
     this.mapElement = marker;
 
     if (map) {
@@ -71,7 +71,7 @@ class Marker extends Evented<MarkerPropsI & MapContextI, any> {
   componentDidUpdate(prevProps: any, prevState: any, snapshot?: any): void {
     const { lngLat: nextLngLat } = this.props;
     const { lngLat: prevLngLat } = prevProps;
-    // update marker position if lngLat ref changed
+    // Update marker position if lngLat ref changed
     if (nextLngLat !== prevLngLat) {
       this.marker.setLngLat(nextLngLat);
     }
@@ -80,7 +80,7 @@ class Marker extends Evented<MarkerPropsI & MapContextI, any> {
   }
 
   componentWillUnmount(): void {
-    // remove marker from map instance if marker unmounts
+    // Remove marker from map instance if marker unmounts
     this.marker.remove();
     ReactDOM.unmountComponentAtNode(this.componentContainer);
     super.componentWillUnmount();
@@ -96,8 +96,10 @@ class Marker extends Evented<MarkerPropsI & MapContextI, any> {
 
   render(): any {
     const { children } = this.props;
-    if (!children) return null;
-    // if children are passed to marker render children else the default Mapbox marker will be rendered
+    if (!children) {
+      return null;
+    }
+    // If children are passed to marker render children else the default Mapbox marker will be rendered
     return (
       <span
         ref={this.bindComponentContainer}
@@ -112,4 +114,4 @@ class Marker extends Evented<MarkerPropsI & MapContextI, any> {
   }
 }
 
-export default withMapContext<MarkerPropsI, any>(Marker);
+export default withMapContext<IMarkerPropsI, any>(Marker);

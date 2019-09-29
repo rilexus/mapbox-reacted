@@ -8,21 +8,21 @@ import {
   LineLayout,
   FillLayout,
 } from 'mapbox-gl';
-import { EventHandler, LayerTypes, MapContextI } from './types';
+import { EventHandler, LayerTypes, IMapContext } from './types';
 import { MapLayer } from './MapLayer';
 import { withMapContext } from './context';
 
-interface LayerStateI {
+interface ILayerState {
   layerID: string;
   serializedLayer: any;
 }
 
-interface LayerEventsI {
+interface ILayerEvents {
   click?: EventHandler;
   move?: EventHandler;
 }
 
-interface LayerProps extends LayerEventsI {
+interface ILayerProps extends ILayerEvents {
   layerName: string;
 
   circlePaint?: CirclePaint;
@@ -38,22 +38,22 @@ interface LayerProps extends LayerEventsI {
   filter?: string[];
 }
 
-class Layer extends MapLayer<LayerProps & MapContextI, LayerStateI> {
+class Layer extends MapLayer<ILayerProps & IMapContext, ILayerState> {
   contextValue: any;
   constructor(props: any) {
     super(props);
     this.state = {};
-    // adds passed geojson feature to data source
+    // Adds passed geojson feature to data source
     this.addFeature = this.addFeature.bind(this);
-    // removes passed feature from data source
+    // Removes passed feature from data source
     this.removeFeature = this.removeFeature.bind(this);
-    // creates layers of various types for passed feature children with out own style
-    // provides context to own children. see Feature Component
+    // Creates layers of various types for passed feature children with out own style
+    // Provides context to own children. see Feature Component
     this.init = this.init.bind(this);
     // (helper function) updates layer paint and layout style
-    // is used when own childs paint and/or layer updates
+    // Is used when own childs paint and/or layer updates
     this.updateLayerStyle = this.updateLayerStyle.bind(this);
-    // updates feature coordinates, paint, layout
+    // Updates feature coordinates, paint, layout
     this.updateFeature = this.updateFeature.bind(this);
   }
 
@@ -123,6 +123,7 @@ class Layer extends MapLayer<LayerProps & MapContextI, LayerStateI> {
 
       let paint = {};
       let layout = {};
+      // tslint:disable-next-line:variable-name
       let _filter: string[] = [''];
 
       if (type === LayerTypes.Fill) {
@@ -140,30 +141,30 @@ class Layer extends MapLayer<LayerProps & MapContextI, LayerStateI> {
       }
 
       const layerOptions = {
-        id: layerID,
-        type: type,
-        source: sourceID,
-        paint: paint,
-        layout: layout,
         filter: filter || _filter,
+        id: layerID,
+        layout,
+        paint,
+        source: sourceID,
+        type,
       };
       map.addLayer(layerOptions);
       const layer = map.getLayer(layerID);
 
       this.setState(
-        (curState: LayerStateI) => ({
+        (curState: ILayerState) => ({
           ...curState,
-          layerID: layerID,
-          layer: layer,
+          layer,
+          layerID,
         }),
         () => {
           this.contextValue = {
             ...this.props.mapbox,
             layer: {
-              layer,
               addFeature: this.addFeature,
-              updateFeature: this.updateFeature,
+              layer,
               removeFeature: this.removeFeature,
+              updateFeature: this.updateFeature,
             },
           };
 
@@ -180,13 +181,13 @@ class Layer extends MapLayer<LayerProps & MapContextI, LayerStateI> {
 
     if (paint) {
       Object.entries(paint).forEach(([paintProperty, paintValue]) => {
-        // https://docs.mapbox.com/mapbox-gl-js/api/#map#setpaintproperty
+        // Https://docs.mapbox.com/mapbox-gl-js/api/#map#setpaintproperty
         map.setPaintProperty(layerID, paintProperty, paintValue);
       });
     }
     if (layout) {
       Object.entries(layout).forEach(([layoutProperty, layoutValue]) => {
-        // https://docs.mapbox.com/mapbox-gl-js/api/#map#setlayoutproperty
+        // Https://docs.mapbox.com/mapbox-gl-js/api/#map#setlayoutproperty
         map.setLayoutProperty(layerID, layoutProperty, layoutValue);
       });
     }
@@ -209,7 +210,9 @@ class Layer extends MapLayer<LayerProps & MapContextI, LayerStateI> {
 
     const newFeatures = oldFeatures.map((feature: any) => {
       const { __id } = feature.properties;
-      if (__id != featureID) return feature;
+      if (__id !== featureID) {
+        return feature;
+      }
 
       const updatedFeature = {
         ...feature,
@@ -252,5 +255,5 @@ class Layer extends MapLayer<LayerProps & MapContextI, LayerStateI> {
   }
 }
 
-// make map context available in this component
-export default withMapContext<LayerProps, any>(Layer);
+// Make map context available in this component
+export default withMapContext<ILayerProps, any>(Layer);

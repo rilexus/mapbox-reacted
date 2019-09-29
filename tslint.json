@@ -7,10 +7,9 @@
     "jsRules": {},
     "rules": {
         "comment-format": [true, "check-space", "check-uppercase"],
-        "file-name-casing": [true, "pascal-case"],
-        "no-use-before-declare": true,
+        "file-name-casing": [true, "pascal-case", {"index.*": "ignore"}],
         "max-classes-per-file": [true, 1],
-        "no-console": true,
+        "no-console": [true, "log"],
         "member-access": false,
         "interface-over-type-literal": false,
         "ordered-imports": false

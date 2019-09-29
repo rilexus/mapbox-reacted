@@ -4,8 +4,7 @@ import { MapContextProvider } from './context';
 import { MapLayer } from './MapLayer';
 import { Lat, Lng } from './types';
 
-// tslint:disable-next-line:interface-name
-interface MapPropsI {
+interface IMapProps {
   accessToken: string;
   mapContainerId: string;
   style: string;
@@ -15,8 +14,7 @@ interface MapPropsI {
   zoom: number;
 }
 
-// Start at componentDiMount
-export default class Map extends MapLayer<MapPropsI, {}> {
+export default class Map extends MapLayer<IMapProps, {}> {
   public contextValue: any;
   public mapElementContainer: any;
   public mapElement: any;

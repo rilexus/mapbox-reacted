@@ -3,11 +3,11 @@ import uuid from 'uuid';
 import { EventHandler, EventType, FeatureTypes } from './types';
 import { MapLayer } from './MapLayer';
 
-export interface FeatureProps {
+export interface IFeatureProps {
   coordinates: any;
   properties?: { [key: string]: any };
 }
-interface FeatureStateI {
+interface IFeatureStateI {
   __id: string;
 }
 export default class Feature<P, State> extends MapLayer<P, State> {
@@ -28,15 +28,14 @@ export default class Feature<P, State> extends MapLayer<P, State> {
 
     if (layer) {
       const id = uuid();
-      // save unique id for the feature
+      // Save unique id for the feature
       this.setState(
-        (state: FeatureStateI) => ({
+        (state: IFeatureStateI) => ({
           ...state,
           __id: id,
         }),
         () => {
           const feature = {
-            type: 'Feature',
             geometry: {
               ...geometry,
             },
@@ -44,6 +43,7 @@ export default class Feature<P, State> extends MapLayer<P, State> {
               ...properties,
               __id: id,
             },
+            type: 'Feature',
           };
           layer.addFeature(feature);
 
@@ -67,7 +67,7 @@ export default class Feature<P, State> extends MapLayer<P, State> {
     // NOTE: EventHandlers are attached to a whole map layer not a specific feature by default.
     // See: https://docs.mapbox.com/mapbox-gl-js/example/popup-on-click/
     // Every feature event handler is called on a map event
-    // and need to be filtered to distinguish the fired event to a specific feature.
+    // And need to be filtered to distinguish the fired event to a specific feature.
     const {
       mapbox: { layer, map },
     } = this.props;
@@ -78,8 +78,8 @@ export default class Feature<P, State> extends MapLayer<P, State> {
       const eventFilter = (e: any) => {
         const { __id } = this.state;
 
-        // if the feature __id in the fired event is same as the current feature __id
-        // the event will be passed(filtered) along, else dont.
+        // If the feature __id in the fired event is same as the current feature __id
+        // The event will be passed(filtered) along, else dont.
         if (e && e.features && e.features[0].properties.__id === __id) {
           eventHandler(e);
         }

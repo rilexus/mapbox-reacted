@@ -59,7 +59,7 @@ export class Evented<Props, State> extends Component<any, any> {
     prevState: Readonly<any>,
     snapshot?: any
   ): void {
-    // binds/re-binds event handlers passed to component
+    // Binds/re-binds event handlers passed to component
     this.extractedEventHandlers = this.bindEvents(
       this.extractEventHandlers(this.props),
       this.extractedEventHandlers
@@ -71,8 +71,8 @@ export class Evented<Props, State> extends Component<any, any> {
    * @param {Object} fromProps
    */
   extractEventHandlers(fromProps: any) {
-    // takes all event functions passed to the component in props if in recognizedEventTypes
-    // and saves it in the extractedEventHandlers Object
+    // Takes all event functions passed to the component in props if in recognizedEventTypes
+    // And saves it in the extractedEventHandlers Object
     return Object.keys(fromProps).reduce((acc: any, propName) => {
       if (
         fromProps[propName] !== null &&
@@ -100,29 +100,32 @@ export class Evented<Props, State> extends Component<any, any> {
     prev: EventsObject = {},
     eventEmitter = this.mapElement
   ): EventsObject {
-    // if no element to bind to or element does not support/emit events
-    if (!eventEmitter || !eventEmitter.on) return {};
+    // If no element to bind to or element does not support/emit events
+    if (!eventEmitter || !eventEmitter.on) {
+      return {};
+    }
 
-    // collect new event handlers in this Obj
+    // Collect new event handlers in this Obj
     const newEventObject: EventsObject = {};
 
-    // remove prev event handlers from event emitter element
+    // Remove prev event handlers from event emitter element
     Object.entries(prev).forEach(
       ([
         eventType /* event name: click, move, etc ... */,
         eventHandler /* function to handle event, passed to component*/,
       ]) => {
         if (prev[eventType] !== next[eventType] || !next[eventType]) {
-          // if next event handler changed it will be removed from eventEmitter
+          // If next event handler changed it will be removed from eventEmitter
           eventEmitter.off(eventType, eventHandler);
         }
-        // keep unchanged event handlers
-        if (prev[eventType] === next[eventType])
+        // Keep unchanged event handlers
+        if (prev[eventType] === next[eventType]) {
           newEventObject[eventType] = eventHandler;
+        }
       }
     );
 
-    // add next event handlers to eventEmitter
+    // Add next event handlers to eventEmitter
     Object.entries(next).forEach(([eventType, eventHandler]) => {
       if (next[eventType] !== prev[eventType] || !prev[eventType]) {
         newEventObject[eventType] = eventHandler;

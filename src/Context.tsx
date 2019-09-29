@@ -1,4 +1,3 @@
-// tslint:disable-next-line:file-name-casing
 import React, {
   ComponentClass,
   ComponentType,
@@ -7,13 +6,13 @@ import React, {
   forwardRef,
   useContext,
 } from 'react';
-import { MapContextI } from './types';
+import { IMapContext } from './types';
 
-const MapContext = createContext<MapContextI>({});
+const MapContext = createContext<IMapContext>({});
 export const MapContextConsumer = MapContext.Consumer;
 export const MapContextProvider = MapContext.Provider;
 
-export const useMapContext = () => useContext<MapContextI>(MapContext);
+export const useMapContext = () => useContext<IMapContext>(MapContext);
 
 export const withMapContext = <Props, Instance>(
   WrappedComponent: ComponentClass<Props, Instance>
@@ -21,7 +20,7 @@ export const withMapContext = <Props, Instance>(
 ): ComponentType<Omit<Props, 'mapbox'>> => {
   const WithMapContextComponent = (props: any, ref: any) => (
     <MapContextConsumer>
-      {(mapContext: MapContextI) => (
+      {(mapContext: IMapContext) => (
         <WrappedComponent ref={ref} {...props} mapbox={mapContext} />
       )}
     </MapContextConsumer>
