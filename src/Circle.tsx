@@ -1,5 +1,5 @@
 import React from 'react';
-import { withMapContext } from './context';
+import { withMapContext } from './Context';
 import Feature, { IFeatureProps } from './Feature';
 import { EventHandler, FeatureTypes, Lat, Lng } from './types';
 

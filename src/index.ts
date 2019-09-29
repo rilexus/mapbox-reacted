@@ -15,4 +15,4 @@ export {
   useMapContext,
   MapContextConsumer,
   MapContextProvider,
-} from './context';
+} from './Context';

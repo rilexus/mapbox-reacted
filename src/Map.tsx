@@ -1,6 +1,6 @@
 import Mapbox, { MapboxOptions } from 'mapbox-gl';
 import React, { CSSProperties } from 'react';
-import { MapContextProvider } from './context';
+import { MapContextProvider } from './Context';
 import MapLayer from './MapLayer';
 import { Lat, Lng } from './types';
 

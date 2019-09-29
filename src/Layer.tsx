@@ -10,7 +10,7 @@ import {
 } from 'mapbox-gl';
 import { EventHandler, LayerTypes, IMapContext } from './types';
 import MapLayer from './MapLayer';
-import { withMapContext } from './context';
+import { withMapContext } from './Context';
 
 interface ILayerState {
   layerID: string;

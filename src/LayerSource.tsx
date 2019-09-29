@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import uuid from 'uuid';
-import { MapContextProvider, withMapContext } from './context';
+import { MapContextProvider, withMapContext } from './Context';
 
 interface ILayerSourceState {
   sourceID: string;
