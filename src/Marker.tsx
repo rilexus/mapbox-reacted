@@ -3,7 +3,7 @@ import * as MapBox from 'mapbox-gl';
 import ReactDOM from 'react-dom';
 import { withMapContext } from './context';
 import { EventHandler, IMapContext } from './types';
-import { Evented } from './Evented';
+import Evented from './Evented';
 
 interface IMarkerEvents {
   dragend?: EventHandler;
