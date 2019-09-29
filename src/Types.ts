@@ -1,4 +1,3 @@
-// tslint:disable-next-line:file-name-casing
 import { Map } from 'mapbox-gl';
 
 export type Lat = number;

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import uuid from 'uuid';
 import { MapContextProvider, withMapContext } from './Context';
+import { IMapContext } from './Types';
 
 interface ILayerSourceState {
   sourceID: string;
@@ -10,7 +11,7 @@ interface ILayerSourceState {
 /**
  * Adds data geoJson data source to the component which extends this class
  */
-class LayersSource<P, S> extends Component<P & any, S & ILayerSourceState> {
+class LayersSource extends Component<IMapContext, ILayerSourceState> {
   contextValue: any;
 
   constructor(props: any) {
@@ -35,7 +36,7 @@ class LayersSource<P, S> extends Component<P & any, S & ILayerSourceState> {
    * @param features
    */
   setFeatures(features: GeoJSON.Feature[]): void {
-    const source = this.getSource();
+    const source: any = this.getSource();
     if (source) {
       source.setData({
         features,
@@ -46,7 +47,7 @@ class LayersSource<P, S> extends Component<P & any, S & ILayerSourceState> {
   }
 
   getFeatures(): GeoJSON.Feature[] {
-    const source = this.getSource();
+    const source: any = this.getSource();
     return (source && source._data.features) || [];
   }
 
@@ -164,4 +165,4 @@ class LayersSource<P, S> extends Component<P & any, S & ILayerSourceState> {
     return <>{children}</>;
   }
 }
-export default withMapContext<ILayerSourceState, any>(LayersSource);
+export default withMapContext<{}, any>(LayersSource);
