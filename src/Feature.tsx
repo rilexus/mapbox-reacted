@@ -1,6 +1,6 @@
 import React from 'react';
 import uuid from 'uuid';
-import { EventHandler, EventType, FeatureTypes } from './types';
+import { EventHandler, EventType, FeatureTypes } from './Types';
 import MapLayer from './MapLayer';
 
 export interface IFeatureProps {

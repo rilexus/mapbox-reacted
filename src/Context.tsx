@@ -5,7 +5,7 @@ import React, {
   forwardRef,
   useContext,
 } from 'react';
-import { IMapContext } from './types';
+import { IMapContext } from './Types';
 
 const MapContext = createContext<IMapContext>({});
 export const MapContextConsumer = MapContext.Consumer;

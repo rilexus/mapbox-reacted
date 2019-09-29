@@ -2,7 +2,7 @@ import React from 'react';
 import * as MapBox from 'mapbox-gl';
 import ReactDOM from 'react-dom';
 import { withMapContext } from './Context';
-import { EventHandler, IMapContext } from './types';
+import { EventHandler, IMapContext } from './Types';
 import Evented from './Evented';
 
 interface IMarkerEvents {

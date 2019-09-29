@@ -8,7 +8,7 @@ export { default as Marker } from './Marker';
 export { default as LayerSource } from './LayerSource';
 export { default as Feature } from './Feature';
 
-export { LayerTypes, FeatureTypes } from './types';
+export { LayerTypes, FeatureTypes } from './Types';
 
 export {
   withMapContext,

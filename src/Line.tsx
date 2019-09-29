@@ -1,7 +1,7 @@
 import React from 'react';
 import { withMapContext } from './Context';
 import Feature, { IFeatureProps } from './Feature';
-import { EventHandler, FeatureTypes } from './types';
+import { EventHandler, FeatureTypes } from './Types';
 
 interface ILineProps extends IFeatureProps {
   coordinates: number[][];
