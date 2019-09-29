@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { EventHandler, EventsObject, EventType } from "./types";
+import React, { Component } from 'react';
+import { EventHandler, EventsObject, EventType } from './types';
 
 /**
  * NOTE: "event handler" refers to a function passed to a component which will be called
@@ -15,23 +15,23 @@ import { EventHandler, EventsObject, EventType } from "./types";
  */
 export class Evented<Props, State> extends Component<any, any> {
   recognizedEventTypes = [
-    "dblclick",
-    "dragend",
-    "drag",
-    "dragStart",
-    "mouseenter",
-    "mouseout",
-    "contextmenu",
-    "touchstart",
-    "touchend",
-    "move",
-    "touchcancel",
-    "mouseup",
-    "mousemove",
-    "mouseleave",
-    "mousedown",
-    "click",
-    "mouseover"
+    'dblclick',
+    'dragend',
+    'drag',
+    'dragStart',
+    'mouseenter',
+    'mouseout',
+    'contextmenu',
+    'touchstart',
+    'touchend',
+    'move',
+    'touchcancel',
+    'mouseup',
+    'mousemove',
+    'mouseleave',
+    'mousedown',
+    'click',
+    'mouseover',
   ];
   mapElement: any;
   /**
@@ -41,6 +41,7 @@ export class Evented<Props, State> extends Component<any, any> {
 
   constructor(props: Props) {
     super(props);
+
     this.extractEventHandlers = this.extractEventHandlers.bind(this);
     this.bindEvents = this.bindEvents.bind(this);
     this.unbindEvents = this.unbindEvents.bind(this);
@@ -109,7 +110,7 @@ export class Evented<Props, State> extends Component<any, any> {
     Object.entries(prev).forEach(
       ([
         eventType /* event name: click, move, etc ... */,
-        eventHandler /* function to handle event, passed to component*/
+        eventHandler /* function to handle event, passed to component*/,
       ]) => {
         if (prev[eventType] !== next[eventType] || !next[eventType]) {
           // if next event handler changed it will be removed from eventEmitter
@@ -140,7 +141,9 @@ export class Evented<Props, State> extends Component<any, any> {
     eventsObject: EventsObject = this.extractedEventHandlers,
     element = this.mapElement
   ): void {
-    if (!element) return;
+    if (!element) {
+      return;
+    }
 
     Object.entries(eventsObject).forEach(
       ([eventType, eventHandleFunction]: [EventType, EventHandler]) => {
@@ -150,6 +153,8 @@ export class Evented<Props, State> extends Component<any, any> {
   }
 
   fireEvent(eventType: string, data?: any) {
-    if (this.mapElement) this.mapElement.fire(eventType, data);
+    if (this.mapElement) {
+      this.mapElement.fire(eventType, data);
+    }
   }
 }

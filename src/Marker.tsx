@@ -1,9 +1,9 @@
-import React from "react";
-import * as MapBox from "mapbox-gl";
-import ReactDOM from "react-dom";
-import { withMapContext } from "./context";
-import { EventHandler, MapContext } from "./types";
-import { Evented } from "./Evented";
+import React from 'react';
+import * as MapBox from 'mapbox-gl';
+import ReactDOM from 'react-dom';
+import { withMapContext } from './context';
+import { EventHandler, MapContextI } from './types';
+import { Evented } from './Evented';
 
 interface MarkerEvents {
   dragend?: EventHandler;
@@ -20,22 +20,22 @@ interface MarkerPropsI extends MarkerEvents {
     draggable: boolean;
     color?: string;
     anchor?:
-      | "center"
-      | "top"
-      | "bottom"
-      | "left"
-      | "right"
-      | "top-left"
-      | "top-right"
-      | "bottom-left"
-      | "bottom-right";
+      | 'center'
+      | 'top'
+      | 'bottom'
+      | 'left'
+      | 'right'
+      | 'top-left'
+      | 'top-right'
+      | 'bottom-left'
+      | 'bottom-right';
     offset?: [number, number];
   };
 
   lngLat: [number, number];
 }
 
-class Marker extends Evented<MarkerPropsI & MapContext, any> {
+class Marker extends Evented<MarkerPropsI & MapContextI, any> {
   marker: MapBox.Marker;
   markerContainer: any = null;
   componentContainer: any;
@@ -49,12 +49,12 @@ class Marker extends Evented<MarkerPropsI & MapContext, any> {
       options,
       mapbox: { map },
       lngLat,
-      children
+      children,
     } = this.props;
 
     const marker = new MapBox.Marker({
       ...options,
-      element: this.markerContainer
+      element: this.markerContainer,
     });
     this.marker = marker;
     // set mapElement to marker => event handle functions passed to this component
@@ -101,10 +101,10 @@ class Marker extends Evented<MarkerPropsI & MapContext, any> {
     return (
       <span
         ref={this.bindComponentContainer}
-        onClick={e => this.fireEvent("click", e)}
-        onMouseOver={e => this.fireEvent("mouseover", e)}
-        onMouseEnter={e => this.fireEvent("mouseenter", e)}
-        onMouseLeave={e => this.fireEvent("mouseleave", e)}
+        onClick={e => this.fireEvent('click', e)}
+        onMouseOver={e => this.fireEvent('mouseover', e)}
+        onMouseEnter={e => this.fireEvent('mouseenter', e)}
+        onMouseLeave={e => this.fireEvent('mouseleave', e)}
       >
         <span ref={this.bindMarkerContainerElement}>{children}</span>
       </span>

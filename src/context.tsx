@@ -1,32 +1,33 @@
+// tslint:disable-next-line:file-name-casing
 import React, {
   ComponentClass,
   ComponentType,
   createContext,
   FC,
   forwardRef,
-  useContext
-} from "react";
-import { MapContext } from "./types";
+  useContext,
+} from 'react';
+import { MapContextI } from './types';
 
-const _MapContext = createContext<MapContext>({});
-export const MapContextConsumer = _MapContext.Consumer;
-export const MapContextProvider = _MapContext.Provider;
+const MapContext = createContext<MapContextI>({});
+export const MapContextConsumer = MapContext.Consumer;
+export const MapContextProvider = MapContext.Provider;
 
-export const useMapContext = () => useContext<MapContext>(_MapContext);
+export const useMapContext = () => useContext<MapContextI>(MapContext);
 
 export const withMapContext = <Props, Instance>(
   WrappedComponent: ComponentClass<Props, Instance>
   // TODO: Omit CanvasContext in more efficient way
-): ComponentType<Omit<Props, "map" | "layer">> => {
+): ComponentType<Omit<Props, 'mapbox'>> => {
   const WithMapContextComponent = (props: any, ref: any) => (
     <MapContextConsumer>
-      {(mapContext: MapContext) => (
+      {(mapContext: MapContextI) => (
         <WrappedComponent ref={ref} {...props} mapbox={mapContext} />
       )}
     </MapContextConsumer>
   );
   const name =
-    WrappedComponent.displayName || WrappedComponent.name || "Component";
+    WrappedComponent.displayName || WrappedComponent.name || 'Component';
   WithMapContextComponent.displayName = `MapComponent(${name})`;
   const Component = forwardRef(WithMapContextComponent);
 

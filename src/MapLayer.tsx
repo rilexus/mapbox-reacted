@@ -1,6 +1,6 @@
-import React, { Component, Fragment } from "react";
-import { MapContextProvider } from "./context";
-import { Evented } from "./Evented";
+import React, { Component, Fragment } from 'react';
+import { MapContextProvider } from './context';
+import { Evented } from './Evented';
 
 export class MapLayer<P, S> extends Evented<P, any> {
   contextValue: any = null;
@@ -18,14 +18,17 @@ export class MapLayer<P, S> extends Evented<P, any> {
 
   render(): any {
     const { children } = this.props;
-    if (children === null) return null;
+    if (children === null) {
+      return null;
+    }
 
-    if (this.contextValue)
+    if (this.contextValue) {
       return (
         <MapContextProvider value={this.contextValue}>
           {children}
         </MapContextProvider>
       );
+    }
 
     return null;
   }

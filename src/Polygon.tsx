@@ -1,20 +1,22 @@
-import React from "react";
-import { withMapContext } from "./context";
-import Feature, { FeatureProps } from "./Feature";
-import { EventHandler, FeatureTypes } from "./types";
+import React from 'react';
+import { withMapContext } from './context';
+import Feature, { FeatureProps } from './Feature';
+import { EventHandler, FeatureTypes } from './types';
 
+// tslint:disable-next-line:interface-name
 interface PolygonEvents {
   click?: EventHandler;
   mouseover?: EventHandler;
+
   mouseenter?: EventHandler;
 }
 
+// tslint:disable-next-line:interface-name
 interface PolygonProps extends FeatureProps, PolygonEvents {
   coordinates: number[][][];
 }
-interface PolygonState {}
 
-class Polygon extends Feature<PolygonProps, PolygonState> {
+class Polygon extends Feature<PolygonProps, {}> {
   constructor(props: any) {
     super(props);
     this.featureType = FeatureTypes.Polygon;
@@ -25,6 +27,7 @@ class Polygon extends Feature<PolygonProps, PolygonState> {
     this.addFeature({ type: this.featureType, coordinates }, properties || {});
     super.componentDidMount();
   }
+
   componentDidUpdate(
     prevProps: Readonly<any>,
     prevState: Readonly<any>,
@@ -32,6 +35,7 @@ class Polygon extends Feature<PolygonProps, PolygonState> {
   ): void {
     super.componentDidUpdate(prevProps, prevState, snapshot);
   }
+
   componentWillUnmount(): void {
     super.componentWillUnmount();
   }

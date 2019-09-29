@@ -1,60 +1,60 @@
-import React, { Component } from "react";
-import ReactDOM from "react-dom";
-import * as MapBox from "mapbox-gl";
-import { withMapContext } from "./context";
-import { EventHandler, MapContext } from "./types";
-import { LngLatLike } from "mapbox-gl";
-import uuid from "uuid";
+import * as MapBox from 'mapbox-gl';
+import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
+import { withMapContext } from './context';
+import { EventHandler, MapContextI } from './types';
+import { LngLatLike } from 'mapbox-gl';
+import uuid from 'uuid';
 
+// tslint:disable-next-line:interface-name
 interface PopupPropsI {
   lngLat: LngLatLike;
   open?: EventHandler;
   close?: EventHandler;
 }
 
-class Popup extends Component<PopupPropsI & MapContext, any> {
+class Popup extends Component<PopupPropsI & MapContextI, any> {
   popup: MapBox.Popup;
-  lngLatBounds: MapBox.LngLatBounds;
   popupContainer: any;
   containerEl: any;
-  static displayName = "Popup";
 
   constructor(props: any) {
     super(props);
     const {
       mapbox: { map },
-      lngLat
+      lngLat,
     } = this.props;
 
     this.state = {
-      popupID: `popup-${uuid()}`
+      popupID: `popup-${uuid()}`,
     };
 
     const popupOptions = { closeButton: false, closeOnClick: false };
     this.popup = new MapBox.Popup(popupOptions)
       .setLngLat(lngLat)
-      .setMaxWidth("auto")
+      .setMaxWidth('auto')
       .addTo(map);
     if (this.props.close) {
-      this.popup.on("close", this.props.close);
+      this.popup.on('close', this.props.close);
     }
     if (this.props.open) {
-      this.popup.on("open", this.props.open);
+      this.popup.on('open', this.props.open);
     }
   }
 
   bindPopupToContainer = (el: any) => {
-    if (el) this.popupContainer = el;
+    if (el) {
+      this.popupContainer = el;
+    }
   };
 
   componentDidMount(): void {
-    console.log("pop mount");
     if (this.popupContainer) {
       this.popup.setDOMContent(this.popupContainer);
     }
   }
   componentDidUpdate(
-    prevProps: Readonly<PopupPropsI & MapContext>,
+    prevProps: Readonly<PopupPropsI & MapContextI>,
     prevState: Readonly<any>,
     snapshot?: any
   ): void {
@@ -64,12 +64,11 @@ class Popup extends Component<PopupPropsI & MapContext, any> {
   componentWillUnmount(): void {
     if (this.popup) {
       if (this.props.open) {
-        this.popup.off("open", this.props.open);
+        this.popup.off('open', this.props.open);
       }
       if (this.props.close) {
-        this.popup.off("close", this.props.close);
+        this.popup.off('close', this.props.close);
       }
-      console.log("pop unmount");
 
       ReactDOM.unmountComponentAtNode(this.containerEl);
       this.popup.remove();
@@ -82,7 +81,7 @@ class Popup extends Component<PopupPropsI & MapContext, any> {
   render() {
     const { children } = this.props;
     return (
-      <div ref={this.container} id={"container "}>
+      <div ref={this.container} id={'container '}>
         <div id={this.state.popupID} ref={this.bindPopupToContainer}>
           {children}
         </div>

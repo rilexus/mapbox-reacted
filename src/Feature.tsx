@@ -1,7 +1,7 @@
-import React from "react";
-import uuid from "uuid";
-import { EventHandler, EventType, FeatureTypes } from "./types";
-import { MapLayer } from "./MapLayer";
+import React from 'react';
+import uuid from 'uuid';
+import { EventHandler, EventType, FeatureTypes } from './types';
+import { MapLayer } from './MapLayer';
 
 export interface FeatureProps {
   coordinates: any;
@@ -23,7 +23,7 @@ export default class Feature<P, State> extends MapLayer<P, State> {
 
   addFeature(geometry: GeoJSON.Geometry, properties: any) {
     const {
-      mapbox: { layer, map }
+      mapbox: { layer, map },
     } = this.props;
 
     if (layer) {
@@ -32,18 +32,18 @@ export default class Feature<P, State> extends MapLayer<P, State> {
       this.setState(
         (state: FeatureStateI) => ({
           ...state,
-          __id: id
+          __id: id,
         }),
         () => {
           const feature = {
-            type: "Feature",
+            type: 'Feature',
             geometry: {
-              ...geometry
+              ...geometry,
             },
             properties: {
               ...properties,
-              __id: id
-            }
+              __id: id,
+            },
           };
           layer.addFeature(feature);
 
@@ -53,9 +53,9 @@ export default class Feature<P, State> extends MapLayer<P, State> {
               geometry,
               properties: {
                 ...properties,
-                __id: id
-              }
-            }
+                __id: id,
+              },
+            },
           };
           this.forceUpdate();
         }
@@ -69,7 +69,7 @@ export default class Feature<P, State> extends MapLayer<P, State> {
     // Every feature event handler is called on a map event
     // and need to be filtered to distinguish the fired event to a specific feature.
     const {
-      mapbox: { layer, map }
+      mapbox: { layer, map },
     } = this.props;
 
     this.extractedEventHandlers = Object.entries(
@@ -86,7 +86,7 @@ export default class Feature<P, State> extends MapLayer<P, State> {
       };
       return {
         ...acc,
-        [eventType]: eventFilter
+        [eventType]: eventFilter,
       };
     }, {});
     if (layer) {
@@ -106,19 +106,19 @@ export default class Feature<P, State> extends MapLayer<P, State> {
     const {
       mapbox: { layer, map },
       coordinates,
-      properties
+      properties,
     } = this.props;
     if (layer) {
       layer.updateFeature(this.state.__id, coordinates, {
         ...properties,
-        __id: this.state.__id
+        __id: this.state.__id,
       });
     }
   }
 
   componentDidMount(): void {
     const {
-      mapbox: { map, layer }
+      mapbox: { map, layer },
     } = this.props;
 
     super.componentDidMount();
@@ -126,7 +126,7 @@ export default class Feature<P, State> extends MapLayer<P, State> {
 
   componentWillUnmount(): void {
     const {
-      mapbox: { layer, map }
+      mapbox: { layer, map },
     } = this.props;
     if (layer) {
       Object.entries(this.extractedEventHandlers).forEach(

@@ -1,6 +1,6 @@
-import React, { Component } from "react";
-import uuid from "uuid";
-import { MapContextProvider, withMapContext } from "./context";
+import React, { Component } from 'react';
+import uuid from 'uuid';
+import { MapContextProvider, withMapContext } from './context';
 
 interface LayerSourceStateI {
   sourceID: string;
@@ -25,7 +25,7 @@ class LayersSource<P, S> extends Component<P & any, S & LayerSourceStateI> {
    */
   getSource() {
     const {
-      mapbox: { map }
+      mapbox: { map },
     } = this.props;
     const { sourceID } = this.state;
     return map.getSource(sourceID);
@@ -38,8 +38,8 @@ class LayersSource<P, S> extends Component<P & any, S & LayerSourceStateI> {
     const source = this.getSource();
     if (source) {
       source.setData({
-        type: "FeatureCollection",
-        features: features
+        type: 'FeatureCollection',
+        features: features,
       });
     }
     this.forceUpdate();
@@ -52,7 +52,7 @@ class LayersSource<P, S> extends Component<P & any, S & LayerSourceStateI> {
 
   reAddSource = (e: any) => {
     const {
-      mapbox: { map }
+      mapbox: { map },
     } = this.props;
     if (this.state) {
       const { source, sourceID } = this.state;
@@ -71,16 +71,16 @@ class LayersSource<P, S> extends Component<P & any, S & LayerSourceStateI> {
    */
   init = () => {
     const {
-      mapbox: { map }
+      mapbox: { map },
     } = this.props;
 
     const sourceID = uuid();
     map.addSource(sourceID, {
-      type: "geojson",
+      type: 'geojson',
       data: {
-        type: "FeatureCollection",
-        features: []
-      }
+        type: 'FeatureCollection',
+        features: [],
+      },
     });
     const source = map.getSource(sourceID);
 
@@ -88,7 +88,7 @@ class LayersSource<P, S> extends Component<P & any, S & LayerSourceStateI> {
       state => ({
         ...state,
         sourceID: sourceID,
-        source: source // save source ref in state to be used in reAddSource function
+        source: source, // save source ref in state to be used in reAddSource function
       }),
 
       () => {
@@ -99,8 +99,8 @@ class LayersSource<P, S> extends Component<P & any, S & LayerSourceStateI> {
             setFeatures: this.setFeatures,
             getSource: this.getSource,
             getFeatures: this.getFeatures,
-            removeFeatures: this.removeFeatures
-          }
+            removeFeatures: this.removeFeatures,
+          },
         };
         this.forceUpdate();
       }
@@ -109,12 +109,12 @@ class LayersSource<P, S> extends Component<P & any, S & LayerSourceStateI> {
 
   componentDidMount(): void {
     const {
-      mapbox: { map }
+      mapbox: { map },
     } = this.props;
 
     // unsubscribe on unmount
     map.on(
-      "styledata",
+      'styledata',
       /*
        * if map style changes, map drops its data source and layers
        * therefore it needs to be re-added
@@ -125,7 +125,7 @@ class LayersSource<P, S> extends Component<P & any, S & LayerSourceStateI> {
     );
 
     // unsubscribe on unmount
-    map.on("load", this.init);
+    map.on('load', this.init);
   }
 
   removeFeatures(__ids: string[]): void {
@@ -138,12 +138,12 @@ class LayersSource<P, S> extends Component<P & any, S & LayerSourceStateI> {
 
   componentWillUnmount(): void {
     const {
-      mapbox: { map }
+      mapbox: { map },
     } = this.props;
     if (map) {
       const { sourceID } = this.state;
-      map.off("styledata", this.reAddSource);
-      map.off("load", this.init);
+      map.off('styledata', this.reAddSource);
+      map.off('load', this.init);
       map.removeSource(sourceID);
     }
   }

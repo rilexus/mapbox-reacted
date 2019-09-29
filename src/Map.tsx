@@ -1,65 +1,70 @@
-import React, { CSSProperties } from "react";
-import Mapbox from "mapbox-gl";
-import { MapContextProvider } from "./context";
-import { MapboxOptions } from "mapbox-gl";
-import { Lat, Lng } from "./types";
-import { MapLayer } from "./MapLayer";
+import Mapbox, { MapboxOptions } from 'mapbox-gl';
+import React, { CSSProperties } from 'react';
+import { MapContextProvider } from './context';
+import { MapLayer } from './MapLayer';
+import { Lat, Lng } from './types';
 
+// tslint:disable-next-line:interface-name
 interface MapPropsI {
   accessToken: string;
   mapContainerId: string;
   style: string;
   center: [Lat, Lng];
+
   containerStyle?: CSSProperties;
   zoom: number;
 }
-// start at componentDiMount
+
+// Start at componentDiMount
 export default class Map extends MapLayer<MapPropsI, {}> {
-  contextValue: any;
-  mapElementContainer: any;
-  mapElement: any;
+  public contextValue: any;
+  public mapElementContainer: any;
+  public mapElement: any;
+
+  componentWillUnmount(): void {
+    // Clean up if map un-mounts
+    if (this.mapElement) {
+      this.mapElement.remove();
+    }
+  }
 
   componentDidMount(): void {
     const { zoom, style, center, accessToken, mapContainerId } = this.props;
     (Mapbox as any).accessToken = accessToken;
 
-    // create mapBox with passed props
+    // Create mapBox with passed props
     const options: MapboxOptions = {
-      container: mapContainerId, // container id
-      style: style,
-      center: center, // starting position [lng, lat]
-      zoom: zoom // starting zoom
+      center, // Starting position [lng, lat]
+      container: mapContainerId, // Container id
+      style,
+      zoom, // Starting zoom
     };
     const map: Mapbox.Map = new Mapbox.Map(options);
     this.mapElement = map;
-    // set context for map child components
+    // Set context for map child components
     this.contextValue = {
       container: this.mapElement,
-      map: this.mapElement
+      map: this.mapElement,
     };
     super.componentDidMount();
-    // rerender Map component after MapBox is created to provider MapBox instance in context
+    // Rerender Map component after MapBox is created to provider MapBox instance in context
     this.forceUpdate();
   }
 
-  // safe ref to the map container <div/>
+  // Safe ref to the map container <div/>
   bindMapToContainer = (container: HTMLDivElement) => {
     this.mapElementContainer = container;
   };
 
-  componentWillUnmount(): void {
-    // clean up if map un-mounts
-    if (this.mapElement) this.mapElement.remove();
-  }
   componentDidUpdate(
     prevProps: Readonly<any>,
     prevState: Readonly<any>,
     snapshot?: any
   ): void {
-    // extractedEventHandlers should be handled by the extended Evented class but for some reason
-    // it does not work correctly.
+    // ExtractedEventHandlers should be handled by the extended Evented class but for some reason
+    // It does not work correctly.
     // Popup component does not appear on the map if this.extractEventHandlers(this.props);
-    // is not called explicitly
+    // Is not called explicitly
     this.extractedEventHandlers = this.extractEventHandlers(this.props);
     super.componentDidUpdate(prevProps, prevState, snapshot);
     // TODO: handle map props update
@@ -75,7 +80,7 @@ export default class Map extends MapLayer<MapPropsI, {}> {
           ref={this.bindMapToContainer}
           style={containerStyle ? { ...containerStyle } : {}}
         >
-          {// when context is a available after second render, render children
+          {// When context is a available after second render, render children
           this.contextValue ? (
             <MapContextProvider value={this.contextValue}>
               {children}

@@ -1,10 +1,9 @@
-import React from "react";
-import {withMapContext} from "./context";
-import Feature, {FeatureProps} from "./Feature";
-import {EventHandler, FeatureTypes } from "./types";
+import React from 'react';
+import { withMapContext } from './context';
+import Feature, { FeatureProps } from './Feature';
+import { EventHandler, FeatureTypes } from './types';
 
-
-interface LineProps extends FeatureProps{
+interface LineProps extends FeatureProps {
   coordinates: number[][];
   click?: EventHandler;
 }
@@ -13,12 +12,12 @@ interface LineState {}
 class Line extends Feature<LineProps, LineState> {
   constructor(props: any) {
     super(props);
-    this.featureType = FeatureTypes.LineString
+    this.featureType = FeatureTypes.LineString;
   }
 
   componentDidMount(): void {
-    const { coordinates,properties} = this.props;
-    this.addFeature({ type: this.featureType, coordinates },properties|| {});
+    const { coordinates, properties } = this.props;
+    this.addFeature({ type: this.featureType, coordinates }, properties || {});
     super.componentDidMount();
   }
   componentDidUpdate(
@@ -28,7 +27,6 @@ class Line extends Feature<LineProps, LineState> {
   ): void {
     super.componentDidUpdate(prevProps, prevState, snapshot);
   }
- 
 }
 
 export default withMapContext<LineProps, any>(Line);

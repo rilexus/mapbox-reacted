@@ -1,16 +1,16 @@
-import React from "react";
-import uuid from "uuid";
+import React from 'react';
+import uuid from 'uuid';
 import {
   FillPaint,
   CirclePaint,
   CircleLayout,
   LinePaint,
   LineLayout,
-  FillLayout
-} from "mapbox-gl";
-import { EventHandler, LayerTypes, MapContext } from "./types";
-import { MapLayer } from "./MapLayer";
-import { withMapContext } from "./context";
+  FillLayout,
+} from 'mapbox-gl';
+import { EventHandler, LayerTypes, MapContextI } from './types';
+import { MapLayer } from './MapLayer';
+import { withMapContext } from './context';
 
 interface LayerStateI {
   layerID: string;
@@ -38,7 +38,7 @@ interface LayerProps extends LayerEventsI {
   filter?: string[];
 }
 
-class Layer extends MapLayer<LayerProps & MapContext, LayerStateI> {
+class Layer extends MapLayer<LayerProps & MapContextI, LayerStateI> {
   contextValue: any;
   constructor(props: any) {
     super(props);
@@ -64,8 +64,8 @@ class Layer extends MapLayer<LayerProps & MapContext, LayerStateI> {
   addFeature(newFeature: any): void {
     const {
       mapbox: {
-        container: { getFeatures, setFeatures }
-      }
+        container: { getFeatures, setFeatures },
+      },
     } = this.props;
     const oldFeatures = getFeatures();
     setFeatures([...oldFeatures, newFeature]);
@@ -75,15 +75,15 @@ class Layer extends MapLayer<LayerProps & MapContext, LayerStateI> {
   removeFeature(id: string): void {
     const {
       mapbox: {
-        container: { removeFeatures }
-      }
+        container: { removeFeatures },
+      },
     } = this.props;
     removeFeatures([id]);
   }
 
   reAddLayer = () => {
     const {
-      mapbox: { map }
+      mapbox: { map },
     } = this.props;
     const { layer: curLayer } = this.state;
     if (curLayer) {
@@ -112,10 +112,10 @@ class Layer extends MapLayer<LayerProps & MapContext, LayerStateI> {
       filter,
       mapbox: {
         container: { source },
-        map
+        map,
       },
       layerName,
-      type
+      type,
     } = this.props;
     if (map && source) {
       const layerID = `${layerName}-${uuid()}`;
@@ -123,20 +123,20 @@ class Layer extends MapLayer<LayerProps & MapContext, LayerStateI> {
 
       let paint = {};
       let layout = {};
-      let _filter: string[] = [""];
+      let _filter: string[] = [''];
 
       if (type === LayerTypes.Fill) {
         paint = fillPaint;
         layout = fillLayout;
-        _filter = ["==", "$type", "Polygon"];
+        _filter = ['==', '$type', 'Polygon'];
       }
       if (type === LayerTypes.Circle) {
         paint = circlePaint;
-        _filter = ["==", "$type", "Point"];
+        _filter = ['==', '$type', 'Point'];
       }
       if (type === LayerTypes.Line) {
         paint = linePaint;
-        _filter = ["==", "$type", "LineString"];
+        _filter = ['==', '$type', 'LineString'];
       }
 
       const layerOptions = {
@@ -145,7 +145,7 @@ class Layer extends MapLayer<LayerProps & MapContext, LayerStateI> {
         source: sourceID,
         paint: paint,
         layout: layout,
-        filter: filter || _filter
+        filter: filter || _filter,
       };
       map.addLayer(layerOptions);
       const layer = map.getLayer(layerID);
@@ -154,7 +154,7 @@ class Layer extends MapLayer<LayerProps & MapContext, LayerStateI> {
         (curState: LayerStateI) => ({
           ...curState,
           layerID: layerID,
-          layer: layer
+          layer: layer,
         }),
         () => {
           this.contextValue = {
@@ -163,8 +163,8 @@ class Layer extends MapLayer<LayerProps & MapContext, LayerStateI> {
               layer,
               addFeature: this.addFeature,
               updateFeature: this.updateFeature,
-              removeFeature: this.removeFeature
-            }
+              removeFeature: this.removeFeature,
+            },
           };
 
           this.forceUpdate();
@@ -175,7 +175,7 @@ class Layer extends MapLayer<LayerProps & MapContext, LayerStateI> {
 
   updateLayerStyle(layerID: string, paint?: any, layout?: any) {
     const {
-      mapbox: { map }
+      mapbox: { map },
     } = this.props;
 
     if (paint) {
@@ -201,8 +201,8 @@ class Layer extends MapLayer<LayerProps & MapContext, LayerStateI> {
   updateFeature(featureID: string, coordinates: any, properties: any): void {
     const {
       mapbox: {
-        container: { getFeatures, setFeatures }
-      }
+        container: { getFeatures, setFeatures },
+      },
     } = this.props;
 
     const oldFeatures = getFeatures();
@@ -215,12 +215,12 @@ class Layer extends MapLayer<LayerProps & MapContext, LayerStateI> {
         ...feature,
         geometry: {
           ...feature.geometry,
-          coordinates: [...coordinates]
+          coordinates: [...coordinates],
         },
         properties: {
           ...feature.properties,
-          ...properties
-        }
+          ...properties,
+        },
       };
       return updatedFeature;
     });
@@ -229,18 +229,18 @@ class Layer extends MapLayer<LayerProps & MapContext, LayerStateI> {
 
   componentDidMount(): void {
     const {
-      mapbox: { map }
+      mapbox: { map },
     } = this.props;
-    map.on("styledata", this.reAddLayer);
+    map.on('styledata', this.reAddLayer);
     this.init();
   }
 
   componentWillUnmount(): void {
     const {
-      mapbox: { map }
+      mapbox: { map },
     } = this.props;
     try {
-      map.off("styledata", this.reAddLayer);
+      map.off('styledata', this.reAddLayer);
 
       const { layerID } = this.state;
       if (layerID) {
