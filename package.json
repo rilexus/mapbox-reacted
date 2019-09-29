@@ -1,6 +1,6 @@
 {
   "name": "mapbox-reacted",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "author": "Stanislav Panchenko <mail@stanislavpanchenko.de>",
   "license": "MIT",
   "main": "lib/index.js",
