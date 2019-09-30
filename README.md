@@ -1,8 +1,16 @@
 # Mapbox-reacted
 
 A react wrapper around the Mapbox Gl JS: https://docs.mapbox.com/mapbox-gl-js/api/
+## Installation
+### mapbox-reacted
+Install mapbox-reacted with: 
+`npm i mapbox-reacted`
+### Styles
+You need to include the mapbox-gl css styles. This is easy done by including a <link/> element in to the HTML head.
+`<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.0/mapbox-gl.css' rel='stylesheet' />`
 
-##Example
+
+## Example
 ```
 function App(){
     return (
@@ -64,6 +72,6 @@ function App(){
 }
 ```
 
-##License
+## License
 MIT
 See: [LICENSE](LICENSE) file.
