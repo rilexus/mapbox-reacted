@@ -15,7 +15,7 @@
     "validate": "tslint ./src/*",
     "prettify": " prettier --write --config ./.prettierrc ./src/*",
     "type-check:watch": "npm run type-check -- --watch",
-    "build": "npm run clean && npm run build:ts && npm-run-all --parallel build:umd build:es build:cjs build:umd:min && rimraf ts-build",
+    "build": "npm run clean && npm-run-all --parallel build:umd build:es build:cjs build:umd:min",
     "build:ts": "tsc",
     "build:umd": "cross-env BABEL_ENV=rollup NODE_ENV=development rollup -c",
     "build:es": "cross-env BABEL_ENV=jsnext babel src --out-dir es --extensions \".ts,.tsx\"",
@@ -28,6 +28,7 @@
     "lib/*"
   ],
   "dependencies": {
+    "@babel/runtime": "^7.6.2",
     "uuid": "3.3.3"
   },
   "peerDependencies": {
@@ -48,7 +49,6 @@
     "@babel/preset-env": "^7.6.2",
     "@babel/preset-react": "^7.0.0",
     "@babel/preset-typescript": "^7.6.0",
-    "@babel/runtime": "7.6.2",
     "@types/jest": "24.0.18",
     "@types/mapbox-gl": "^0.54.3",
     "@types/node": "12.7.5",

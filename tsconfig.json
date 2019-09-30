@@ -6,16 +6,16 @@
     "node_modules"
   ],
   "compilerOptions": {
+    "declaration":true,
     "outDir": "ts-build",
     "jsx": "react",
-    "module": "commonjs",
+    "module": "esnext",
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
     "moduleResolution": "node",
-    "sourceMap": true,
-    "allowJs": true
+    "sourceMap": true
   },
   "lib": [
     "dom.iterable",

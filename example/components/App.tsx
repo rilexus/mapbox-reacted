@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Lat, LayerTypes, Lng } from '../../src/types';
-import Map from '../../src/Map';
-import Popup from '../../src/Popup';
-import Layer from '../../src/Layer';
-import Polygon from '../../src/Polygon';
-import LayerSource from '../../src/LayerSource';
+import { Lat, LayerTypes, Lng } from '../../src';
+import { Map } from '../../src';
+import { Popup } from '../../src';
+import { Layer } from '../../src';
+import { Polygon } from '../../src';
+import { LayerSource } from '../../src';
 import { AnimatedCircle } from './AnimatedCircle';
 
 const testPolygon2 = [

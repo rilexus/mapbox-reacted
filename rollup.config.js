@@ -2,6 +2,7 @@ import commonjs from 'rollup-plugin-commonjs';
 import resolve from 'rollup-plugin-node-resolve';
 import babel from 'rollup-plugin-babel';
 import { uglify } from 'rollup-plugin-uglify';
+import typescript from 'rollup-plugin-typescript2';
 
 const env = process.env.NODE_ENV;
 const extensions = [
@@ -11,25 +12,19 @@ const extensions = [
 const name = 'MapboxReacted';
 
 const config = {
-	input: './ts-build/index.js',
-	
-	// Specify here external modules which you don't want to include in your bundle (for instance: 'lodash', 'moment' etc.)
-	// https://rollupjs.org/guide/en#external-e-external
-	external: ['react', 'react-dom','mapboxGl','uuid'],
-	
+	input: './src/index.ts',
+	external: ['react', 'react-dom','mapbox-gl','uuid'],
 	plugins: [
-		// Allows node_modules resolution
+		typescript(),
 		resolve({
 			extensions,
 			preferBuiltins: true,
 		}),
-		
 		// Allow bundling cjs modules. Rollup doesn't understand cjs
-		commonjs({extensions}),
-		
+		commonjs(),
 		babel({
 			extensions,
-			include: ['ts-build/**/*'],
+			include: ['src/**/*'],
 			exclude: '**/node_modules/**',
 			runtimeHelpers:true
 		}),
