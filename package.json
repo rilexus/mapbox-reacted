@@ -3,6 +3,7 @@
   "version": "0.1.7",
   "author": "Stanislav Panchenko <mail@stanislavpanchenko.de>",
   "license": "MIT",
+  "keywords": ["react", "mapbox-gl","map"],
   "main": "lib/index.js",
   "sideEffects": false,
   "module": "es/index.js",
