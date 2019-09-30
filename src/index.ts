@@ -12,18 +12,6 @@ export { default as Circle } from './Circle';
 export { default as Line } from './Line';
 
 export {
-  Lat,
-  Lng,
-  EventType,
-  EventsObject,
-  EventHandler,
-  LayerTypes,
-  FeatureTypes,
-  ILayer,
-  IMapContext
-} from './Types';
-
-export {
   withMapContext,
   useMapContext,
   MapContextConsumer,

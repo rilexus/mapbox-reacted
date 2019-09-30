@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Lat, LayerTypes, Lng } from '../../src';
+import { Lat, LayerTypes, Lng } from '../../src/Types';
 import { Map } from '../../src';
 import { Popup } from '../../src';
 import { Layer } from '../../src';
