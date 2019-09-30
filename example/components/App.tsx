@@ -49,8 +49,8 @@ const App = () => {
     const { lngLat } = e;
     const coordinates = [lngLat.lng, lngLat.lat] as [number, number];
     setPopupData({
+      coordinates,
       visible: true,
-      coordinates: coordinates,
     });
   };
   const hidePopup = () => {

@@ -37,6 +37,7 @@ function App(){
         <Map
             click={()=>{}}
             accessToken={"xyz"}
+            mapContainerId={'map'}
             style={"mapbox://styles/user/unique_token"}
             center={[6.0839, 50.7753]}
             zoom={14}
@@ -57,6 +58,7 @@ function App(){
      return (
          <Map
              click={()=>{}}
+             mapContainerId={'map'}
              accessToken={"xyz"}
              style={"mapbox://styles/user/unique_token"}
              center={[6.0839, 50.7753]}
@@ -106,6 +108,7 @@ function App(){
          <Map
              click={()=>{}}
              accessToken={"xyz"}
+             mapContainerId={'map'}
              style={"mapbox://styles/user/unique_token"}
              center={[6.0839, 50.7753]}
              zoom={14}
@@ -149,6 +152,7 @@ function App(){
     return (
         <Map
             click={()=>{}}
+            mapContainerId={'map'}
             accessToken={"xyz"}
             style={"mapbox://styles/user/unique_token"}
             center={[6.0839, 50.7753]}
